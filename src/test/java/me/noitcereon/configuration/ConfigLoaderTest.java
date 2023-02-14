@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigLoaderTest {
 
-    private ConfigLoader configLoader = ConfigLoader.getInstance("test-configuration.conf");
+    private final ConfigLoader configLoader = ConfigLoader.getInstance("test-configuration.conf");
     @Test
     void givenTestConfiguration_WhenRetrievingExistingProperty_ThenReturnValueOfGivenKey() {
         String expected = "Hello World";
@@ -29,5 +29,12 @@ class ConfigLoaderTest {
         Map<String, String> actual = configLoader.getProperties();
 
         assertEquals(expected, actual);
+    }
+    @Test
+    void givenTestConfiguration_WhenRetrievingAllProperties_ThenDoNotThrowException() {
+        assertDoesNotThrow(() -> {
+            Map<String, String> actual = configLoader.getProperties();
+            assertFalse(actual.isEmpty());
+        });
     }
 }

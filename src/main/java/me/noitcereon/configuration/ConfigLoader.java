@@ -39,11 +39,17 @@ public class ConfigLoader {
         HashMap<String, String> output = new HashMap<>();
         try (scanner) {
             while (scanner.hasNextLine()) {
-                Map.Entry<String, String> keyValuePair = convertLineToKeyValuePair(scanner.nextLine());
+                String line = scanner.nextLine();
+                if(isLineToBeIgnored(line)) continue;
+                Map.Entry<String, String> keyValuePair = convertLineToKeyValuePair(line);
                 output.put(keyValuePair.getKey(), keyValuePair.getValue());
             }
         }
         return output;
+    }
+
+    private static boolean isLineToBeIgnored(String line) {
+        return line.startsWith("#") || line.startsWith("//") || line.isEmpty();
     }
 
     /**

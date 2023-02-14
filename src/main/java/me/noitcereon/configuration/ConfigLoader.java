@@ -57,6 +57,7 @@ public class ConfigLoader {
      * @return The line separated into a key-value pair.
      */
     private Map.Entry<String, String> convertLineToKeyValuePair(String line) {
+        // TODO: Refactor this method to be more readable
         char delimiterChar = '=';
         char encapsulationChar = '"';
         StringBuilder key = new StringBuilder();

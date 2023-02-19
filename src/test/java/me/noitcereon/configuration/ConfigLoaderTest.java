@@ -25,6 +25,7 @@ class ConfigLoaderTest {
         Map<String, String> expected = new HashMap<>();
         expected.put("my-test-value", "Hello World");
         expected.put("test-value-2", "two");
+        expected.put("nothing-is-associated-with-this-key", "");
 
         Map<String, String> actual = configLoader.getProperties();
 
@@ -36,5 +37,13 @@ class ConfigLoaderTest {
             Map<String, String> actual = configLoader.getProperties();
             assertFalse(actual.isEmpty());
         });
+    }
+    @Test
+    void givenTestConfiguration_WhenRetrievingBlankValue_BlankIsReadAsEmptyString() {
+        String expected = "";
+
+        String actual = configLoader.getProperty("nothing-is-associated-with-this-key");
+
+        assertEquals(expected, actual);
     }
 }

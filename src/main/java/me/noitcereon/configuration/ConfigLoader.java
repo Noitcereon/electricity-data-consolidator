@@ -8,16 +8,17 @@ import java.util.Objects;
 import java.util.Scanner;
 
 /**
- * @author Noitcereon
- * @since 0.0.1
  * ConfigLoader loads configuration properties based on the given key from a configuration file.
  * The default configuration file is named `configuration.conf`
+ *
+ * @author Noitcereon
+ * @since 0.0.1
  */
 public class ConfigLoader {
     private static ConfigLoader instance;
     private Map<String, String> configurationProperties;
 
-    private ConfigLoader(String configFileName){
+    private ConfigLoader(String configFileName) {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (InputStream inputStream = classloader.getResourceAsStream(configFileName)) {
             Objects.requireNonNull(inputStream);
@@ -32,6 +33,7 @@ public class ConfigLoader {
 
     /**
      * Takes the configuration file content and maps it to a HashMap.
+     *
      * @param scanner The scanner to read the configuration file from.
      * @return A HashMap with all the configuration properties.
      */
@@ -40,7 +42,7 @@ public class ConfigLoader {
         try (scanner) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if(isLineToBeIgnored(line)) continue;
+                if (isLineToBeIgnored(line)) continue;
                 Map.Entry<String, String> keyValuePair = convertLineToKeyValuePair(line);
                 output.put(keyValuePair.getKey(), keyValuePair.getValue());
             }
@@ -63,25 +65,25 @@ public class ConfigLoader {
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
         boolean isDelimiterReached = false;
-        for (char character : line.toCharArray()){
-            if(character == delimiterChar){
+        for (char character : line.toCharArray()) {
+            if (character == delimiterChar) {
                 isDelimiterReached = true;
                 continue;
             }
-            if(character == encapsulationChar){
+            if (character == encapsulationChar) {
                 continue; // The second time this is reached, it should be finished iterating through the line.charArray.
             }
-            if(!isDelimiterReached){
+            if (!isDelimiterReached) {
                 key.append(character);
             }
-            if(isDelimiterReached){
+            if (isDelimiterReached) {
                 value.append(character);
             }
         }
-        if(key.toString().equals("")){
+        if (key.toString().equals("")) {
             throw new NullPointerException("Key must not be null or empty.");
         }
-        if(value.isEmpty()){
+        if (value.isEmpty()) {
             System.err.println("Warning: The value for the key " + key + " is empty.");
         }
         Map.Entry<String, String> kvp = Map.entry(key.toString(), value.toString());
@@ -94,25 +96,28 @@ public class ConfigLoader {
         getInstance();
         String output = null;
         try {
-            if(configurationProperties.containsKey(key)){
+            if (configurationProperties.containsKey(key)) {
                 output = configurationProperties.get(key);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
         return output;
     }
-    public Map<String, String> getProperties(){
+
+    public Map<String, String> getProperties() {
         return configurationProperties;
     }
-    public static ConfigLoader getInstance(String configFileName){
-        if(Objects.isNull(instance)){
+
+    public static ConfigLoader getInstance(String configFileName) {
+        if (Objects.isNull(instance)) {
             instance = new ConfigLoader(configFileName);
         }
         return instance;
     }
-    public static ConfigLoader getInstance(){
-        if(Objects.isNull(instance)){
+
+    public static ConfigLoader getInstance() {
+        if (Objects.isNull(instance)) {
             instance = new ConfigLoader("configuration.conf");
         }
         return instance;

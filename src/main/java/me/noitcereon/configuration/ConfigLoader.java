@@ -81,8 +81,8 @@ public class ConfigLoader {
         if(key.toString().equals("")){
             throw new NullPointerException("Key must not be null or empty.");
         }
-        if(value.toString().equals("")){
-            throw new NullPointerException("Value must not be null or empty.");
+        if(value.isEmpty()){
+            System.err.println("Warning: The value for the key " + key + " is empty.");
         }
         Map.Entry<String, String> kvp = Map.entry(key.toString(), value.toString());
 

@@ -2,10 +2,7 @@ package me.noitcereon.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * ConfigLoader loads configuration properties based on the given key from a configuration file.
@@ -92,17 +89,18 @@ public class ConfigLoader {
         return kvp;
     }
 
-    public String getProperty(String key) {
+    public Optional<String> getProperty(String key) {
         getInstance();
-        String output = null;
+        String propertyValue = null;
         try {
             if (configurationProperties.containsKey(key)) {
-                output = configurationProperties.get(key);
+                propertyValue = configurationProperties.get(key);
             }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return output;
+        if(propertyValue == null) return Optional.empty();
+        return Optional.of(propertyValue);
     }
 
     public Map<String, String> getProperties() {

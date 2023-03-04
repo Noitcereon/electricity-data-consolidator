@@ -15,7 +15,7 @@ class ConfigLoaderTest {
     void givenTestConfiguration_WhenRetrievingExistingProperty_ThenReturnValueOfGivenKey() {
         String expected = "Hello World";
 
-        String actual = configLoader.getProperty("my-test-value");
+        String actual = configLoader.getProperty("my-test-value").orElseThrow();
 
         Assertions.assertEquals(expected, actual);
     }
@@ -42,7 +42,7 @@ class ConfigLoaderTest {
     void givenTestConfiguration_WhenRetrievingBlankValue_BlankIsReadAsEmptyString() {
         String expected = "";
 
-        String actual = configLoader.getProperty("nothing-is-associated-with-this-key");
+        String actual = configLoader.getProperty("nothing-is-associated-with-this-key").orElseThrow();
 
         assertEquals(expected, actual);
     }

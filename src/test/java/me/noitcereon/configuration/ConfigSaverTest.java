@@ -3,6 +3,7 @@ package me.noitcereon.configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,15 +19,16 @@ class ConfigSaverTest {
     }
 
     @Test
-    void givenKeyValuePair_WhenSavingProperty_ThenUpdateConfigurationFile() {
+    void givenKeyValuePair_WhenSavingProperty_ThenUpdateConfigEntry() {
         String newKey = "one-plus-one-is";
         String expectedKeyValue = String.valueOf(UUID.randomUUID());
         configSaver.saveProperty(newKey, expectedKeyValue);
 
         ConfigLoader configLoader = ConfigLoader.getInstance(testConfigurationFileName);
-        String actualKeyValue = configLoader.getProperty(newKey);
+        Optional<String> actualKeyValue = configLoader.getProperty(newKey);
 
-        assertEquals(expectedKeyValue, actualKeyValue);
+        assertTrue(actualKeyValue.isPresent());
+        assertEquals(expectedKeyValue, actualKeyValue.get());
     }
     @Test
     void givenKeyValuePair_WhenSavingProperty_ThenReturnSuccessMessage(){

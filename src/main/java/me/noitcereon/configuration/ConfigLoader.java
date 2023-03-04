@@ -1,5 +1,7 @@
 package me.noitcereon.configuration;
 
+import me.noitcereon.exceptions.NotImplementedException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -108,16 +110,18 @@ public class ConfigLoader implements ConfigurationLoader {
     }
 
     public static ConfigLoader getInstance(String configFileName) {
-        if (Objects.isNull(instance)) {
-            instance = new ConfigLoader(configFileName);
-        }
-        return instance;
+        throw new NotImplementedException("ConfigLoader is not fully implemented yet.");
+//        if (Objects.isNull(instance)) {
+//            instance = new ConfigLoader(configFileName);
+//        }
+//        return instance;
     }
 
     public static ConfigLoader getInstance() {
-        if (Objects.isNull(instance)) {
-            instance = new ConfigLoader(Constants.HARDCODED_CONFIG_FILE);
-        }
-        return instance;
+        throw new NotImplementedException("ConfigLoader is not fully implemented yet.");
+//        if (Objects.isNull(instance)) {
+//            instance = new ConfigLoader(Constants.HARDCODED_CONFIG_FILE);
+//        }
+//        return instance;
     }
 }

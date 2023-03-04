@@ -116,7 +116,7 @@ public class ConfigLoader {
 
     public static ConfigLoader getInstance() {
         if (Objects.isNull(instance)) {
-            instance = new ConfigLoader("configuration.conf");
+            instance = new ConfigLoader(Constants.HARDCODED_CONFIG_FILE);
         }
         return instance;
     }

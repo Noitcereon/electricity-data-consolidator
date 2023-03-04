@@ -11,7 +11,7 @@ import java.util.*;
  * @author Noitcereon
  * @since 0.0.1
  */
-public class ConfigLoader {
+public class ConfigLoader implements ConfigurationLoader {
     private static ConfigLoader instance;
     private Map<String, String> configurationProperties;
 

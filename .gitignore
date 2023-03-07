@@ -1,2 +1,7 @@
-/src/main/resources/configuration.conf
 /target
+
+# .conf files
+api-key.conf
+data-access-key.conf
+simpleConfigSaverTest.conf
+/src/main/resources/configuration.conf

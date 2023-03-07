@@ -1,6 +1,8 @@
 package me.noitcereon.configuration;
 
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
@@ -10,6 +12,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class SimpleConfigLoader implements ConfigurationLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleConfigLoader.class);
     private static SimpleConfigLoader instance;
     /**
      * Specifies which files are known to the SimpleConfigLoader and will be loaded.
@@ -80,7 +84,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
             Files.createDirectories(Path.of("config"));
             Files.createFile(configFilePath);
         } catch (FileAlreadyExistsException e) {
-            System.out.println("File " + fileName + " already exists.");
+            LOG.debug("File {} already exists.", fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -113,7 +117,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
             throw new NullPointerException("Key must not be null or empty.");
         }
         if (value.isEmpty()) {
-            System.err.println("Warning: The value for the key " + key + " is empty.");
+            LOG.error("Warning: The value for the key {} is empty.", key);
         }
         Map.Entry<String, String> kvp = Map.entry(key.toString(), value.toString());
 

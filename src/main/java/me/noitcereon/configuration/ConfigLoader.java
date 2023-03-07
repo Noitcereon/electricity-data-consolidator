@@ -1,6 +1,8 @@
 package me.noitcereon.configuration;
 
 import me.noitcereon.exceptions.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,8 @@ import java.util.*;
  * @since 0.0.1
  */
 public class ConfigLoader implements ConfigurationLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigLoader.class);
     private static ConfigLoader instance;
     private Map<String, String> configurationProperties;
 
@@ -24,9 +28,8 @@ public class ConfigLoader implements ConfigurationLoader {
             Scanner scanner = new Scanner(inputStream);
             configurationProperties = mapConfigFileToHashMap(scanner);
         } catch (IOException e) {
-            System.err.println("Something went wrong during initialization of ConfigLoader");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            LOG.error("Something went wrong during initialization of ConfigLoader");
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -83,7 +86,7 @@ public class ConfigLoader implements ConfigurationLoader {
             throw new NullPointerException("Key must not be null or empty.");
         }
         if (value.isEmpty()) {
-            System.err.println("Warning: The value for the key " + key + " is empty.");
+            LOG.warn("Warning: The value for the key {} is empty.", key);
         }
         Map.Entry<String, String> kvp = Map.entry(key.toString(), value.toString());
 
@@ -99,7 +102,7 @@ public class ConfigLoader implements ConfigurationLoader {
                 propertyValue = configurationProperties.get(key);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            LOG.error(e.getMessage(), e);
         }
         if(propertyValue == null) return Optional.empty();
         return Optional.of(propertyValue);

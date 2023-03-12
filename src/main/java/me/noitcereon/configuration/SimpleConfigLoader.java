@@ -25,7 +25,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
     private SimpleConfigLoader() {
         files = new HashSet<>();
         files.add("api-key.conf");
-        files.add("data-access-key.conf");
+        files.add("data-access-token.conf");
         files.add("simpleConfigLoaderTest.conf");
     }
 
@@ -94,13 +94,15 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         String key = ConfigurationKeys.API_KEY;
         if(getProperty(key).isEmpty()){
             LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
+            return "";
         }
         return getProperty(key).orElseThrow();
     }
     public String getDataAccessToken(){
         String key = ConfigurationKeys.DATA_ACCESS_TOKEN;
         if(getProperty(key).isEmpty()){
-            LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
+            LOG.error("Data access token has not been set in the data-access-token.conf (./config/data-access-token.conf).");
+            return "";
         }
         return getProperty(key).orElseThrow();
     }

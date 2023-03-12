@@ -2,6 +2,6 @@
 
 # .conf files
 api-key.conf
-data-access-key.conf
+data-access-token.conf
 simpleConfigSaverTest.conf
 /src/main/resources/configuration.conf

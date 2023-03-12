@@ -108,6 +108,16 @@ public class ConfigLoader implements ConfigurationLoader {
         return Optional.of(propertyValue);
     }
 
+    @Override
+    public String getApiKey() {
+        return getProperty(ConfigurationKeys.API_KEY).orElseThrow();
+    }
+
+    @Override
+    public String getDataAccessToken() {
+        return getProperty(ConfigurationKeys.DATA_ACCESS_TOKEN).orElseThrow();
+    }
+
     public Map<String, String> getProperties() {
         return configurationProperties;
     }

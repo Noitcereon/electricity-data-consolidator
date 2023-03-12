@@ -90,6 +90,20 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         }
         return configFilePath;
     }
+    public String getApiKey(){
+        String key = ConfigurationKeys.API_KEY;
+        if(getProperty(key).isEmpty()){
+            LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
+        }
+        return getProperty(key).orElseThrow();
+    }
+    public String getDataAccessToken(){
+        String key = ConfigurationKeys.DATA_ACCESS_TOKEN;
+        if(getProperty(key).isEmpty()){
+            LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
+        }
+        return getProperty(key).orElseThrow();
+    }
 
     private Map.Entry<String, String> convertLineToKeyValuePair(String line) {
         // TODO: Refactor this method to be more readable

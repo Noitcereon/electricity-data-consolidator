@@ -27,30 +27,30 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         files.add("api-key.conf");
         files.add("data-access-key.conf");
         files.add("simpleConfigLoaderTest.conf");
-        files.add("simpleConfigSaverTest.conf");
     }
 
     @Override
     public Optional<String> getProperty(String key) {
-        refreshCache();
+        refreshCache(key);
         if (propertyCache.containsKey(key)) return Optional.of(propertyCache.get(key));
         return Optional.empty();
     }
 
-    private void refreshCache() {
+    private void refreshCache(String keyBeingLookedFor) {
         if (lastRefreshTime == null) {
-            propertyCache = loadConfigurationProperties();
+            propertyCache = loadConfigurationProperties(keyBeingLookedFor);
             lastRefreshTime = LocalTime.now();
         }
         if (lastRefreshTime.plusMinutes(5).isAfter(LocalTime.now())) {
             return;
         }
-        propertyCache = loadConfigurationProperties();
+        propertyCache = loadConfigurationProperties(keyBeingLookedFor);
         lastRefreshTime = LocalTime.now();
     }
 
-    private Map<String, String> loadConfigurationProperties() {
+    private Map<String, String> loadConfigurationProperties(String keyBeingLookedFor) {
         Map<String, String> output = new HashMap<>();
+        files.add(keyBeingLookedFor + ".conf");
         for (String fileName : files) {
             Path file = getConfigFile(fileName);
             try (Scanner scanner = new Scanner(file)) {
@@ -61,7 +61,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
                     output.put(keyValuePair.getKey(), keyValuePair.getValue());
                 }
             } catch (IOException e) {
-                throw new ElectricityConsolidatorRuntimeException();
+                throw new ElectricityConsolidatorRuntimeException(e);
             }
         }
 
@@ -79,7 +79,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
      * @return {@link Path} of created file or existing file.
      */
     private Path getConfigFile(String fileName) {
-        Path configFilePath = Path.of("config/" + fileName);
+        Path configFilePath = Path.of("./config/" + fileName);
         try {
             Files.createDirectories(Path.of("config"));
             Files.createFile(configFilePath);

@@ -26,6 +26,15 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.6</version>
         </dependency>
+        <!-- https://central.sonatype.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.13.3 -->
+        <!-- Serialization/Deserialization dependency -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.2</version>
+        </dependency>
+
+        <!-- TEST dependencies below this point -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

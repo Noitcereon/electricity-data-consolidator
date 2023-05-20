@@ -6,7 +6,7 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.0.1-0.1.0</version> <!-- Semantic Versioning -->
+    <version>0.0.1</version> <!-- Semantic Versioning -->
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -14,6 +14,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+        <!-- slf4j-simple is a temporary logging provider (logs to System.err) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.6</version>
+        </dependency>
+        <!-- https://central.sonatype.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.13.3 -->
+        <!-- Serialization/Deserialization dependency -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.2</version>
+        </dependency>
+
+        <!-- TEST dependencies below this point -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

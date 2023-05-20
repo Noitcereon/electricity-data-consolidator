@@ -1,2 +1,10 @@
-/src/main/resources/configuration.conf
 /target
+.idea
+
+# .conf files
+api-key.conf
+data-access-token.conf
+simpleConfigSaverTest.conf
+/src/main/resources/configuration.conf
+simple-config-saver-key.conf
+last-data-access-refresh.conf

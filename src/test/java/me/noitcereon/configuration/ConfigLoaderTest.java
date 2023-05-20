@@ -10,12 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigLoaderTest {
 
-    private ConfigLoader configLoader = ConfigLoader.getInstance("test-configuration.conf");
+    private final ConfigLoader configLoader = ConfigLoader.getInstance("test-configuration.conf");
     @Test
     void givenTestConfiguration_WhenRetrievingExistingProperty_ThenReturnValueOfGivenKey() {
         String expected = "Hello World";
 
-        String actual = configLoader.getProperty("my-test-value");
+        String actual = configLoader.getProperty("my-test-value").orElseThrow();
 
         Assertions.assertEquals(expected, actual);
     }
@@ -25,8 +25,24 @@ class ConfigLoaderTest {
         Map<String, String> expected = new HashMap<>();
         expected.put("my-test-value", "Hello World");
         expected.put("test-value-2", "two");
+        expected.put("nothing-is-associated-with-this-key", "");
 
         Map<String, String> actual = configLoader.getProperties();
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    void givenTestConfiguration_WhenRetrievingAllProperties_ThenDoNotThrowException() {
+        assertDoesNotThrow(() -> {
+            Map<String, String> actual = configLoader.getProperties();
+            assertFalse(actual.isEmpty());
+        });
+    }
+    @Test
+    void givenTestConfiguration_WhenRetrievingBlankValue_BlankIsReadAsEmptyString() {
+        String expected = "";
+
+        String actual = configLoader.getProperty("nothing-is-associated-with-this-key").orElseThrow();
 
         assertEquals(expected, actual);
     }

@@ -31,26 +31,37 @@ public class SimpleConfigLoader implements ConfigurationLoader {
 
     @Override
     public Optional<String> getProperty(String key) {
-        refreshCache(key);
+        updateConfigurationFiles(key);
+        refreshCache();
         if (propertyCache.containsKey(key)) return Optional.of(propertyCache.get(key));
         return Optional.empty();
     }
 
-    private void refreshCache(String keyBeingLookedFor) {
+    private void updateConfigurationFiles(String key) {
+        if(files.stream().noneMatch(knownConfFiles -> knownConfFiles.equals(key + ".conf"))){
+            files.add(key + ".conf");
+        }
+    }
+
+    @Override
+    public void forceRefreshCache() {
+        propertyCache = loadConfigurationProperties();
+    }
+
+    private void refreshCache() {
         if (lastRefreshTime == null) {
-            propertyCache = loadConfigurationProperties(keyBeingLookedFor);
+            propertyCache = loadConfigurationProperties();
             lastRefreshTime = LocalTime.now();
         }
         if (lastRefreshTime.plusMinutes(5).isAfter(LocalTime.now())) {
             return;
         }
-        propertyCache = loadConfigurationProperties(keyBeingLookedFor);
+        propertyCache = loadConfigurationProperties();
         lastRefreshTime = LocalTime.now();
     }
 
-    private Map<String, String> loadConfigurationProperties(String keyBeingLookedFor) {
+    private Map<String, String> loadConfigurationProperties() {
         Map<String, String> output = new HashMap<>();
-        files.add(keyBeingLookedFor + ".conf");
         for (String fileName : files) {
             Path file = getConfigFile(fileName);
             try (Scanner scanner = new Scanner(file)) {

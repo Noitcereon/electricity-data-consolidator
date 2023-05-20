@@ -10,6 +10,7 @@ public class MeteringPointApiDto {
     private String cityName;
     private boolean hasRelation;
     private String consumerCVR;
+    private String dataAccessCVR;
     private List<ChildMeteringPointDto> childMeteringPoints;
 
     private String streetCode;
@@ -88,6 +89,13 @@ public class MeteringPointApiDto {
         this.consumerCVR = consumerCVR;
     }
 
+    public String getDataAccessCVR() {
+        return dataAccessCVR;
+    }
+
+    public void setDataAccessCVR(String dataAccessCVR) {
+        this.dataAccessCVR = dataAccessCVR;
+    }
     public List<ChildMeteringPointDto> getChildMeteringPoints() {
         return childMeteringPoints;
     }

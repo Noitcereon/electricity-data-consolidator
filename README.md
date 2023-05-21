@@ -1,7 +1,7 @@
 
 
 # electricity-data-consolidator
-![GitHub current branch CI Status](https://github.com/Noitcereon/electricity-data-consolidator/actions/workflows/maven.yml/badge.svg)
+[![GitHub current branch CI Status](https://github.com/Noitcereon/electricity-data-consolidator/actions/workflows/maven.yml/badge.svg)](https://github.com/Noitcereon/electricity-data-consolidator/actions/workflows/maven.yml)
 
 An application that communicates with external APIs to retrieve their data automatically at certain intervals.
 

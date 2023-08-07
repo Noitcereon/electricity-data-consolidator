@@ -6,11 +6,11 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.0.1</version> <!-- Semantic Versioning -->
-
+    <version>0.1.0-alpha.0.1.0</version> <!-- Semantic Versioning -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <maven.surefire-version>3.1.0</maven.surefire-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
@@ -42,5 +42,30 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Maven's official test framework -->
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire-version}</version>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>CI-pipeline</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- Maven's official test framework -->
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${maven.surefire-version}</version>
+                        <configuration>
+                            <excludedGroups>IntegrationTest</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

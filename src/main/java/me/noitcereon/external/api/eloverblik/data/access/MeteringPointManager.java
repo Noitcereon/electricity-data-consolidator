@@ -46,10 +46,9 @@ public class MeteringPointManager {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if(response.statusCode() != 200){
-            ElectricityConsolidatorRuntimeException exception = new ElectricityConsolidatorRuntimeException("Request to endpoint " + request.uri() + " did not return 200 OK response.");
-            LOG.error(exception.getMessage(), exception);
-            throw exception;
+        if (response.statusCode() != 200) {
+            LOG.warn("Request to endpoint '{}' did not return 200 OK response. It instead returned HTTP Status '{}'", request.uri(), response.statusCode());
+            return Optional.empty();
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

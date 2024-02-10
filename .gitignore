@@ -8,3 +8,8 @@ simpleConfigSaverTest.conf
 /src/main/resources/configuration.conf
 simple-config-saver-key.conf
 last-data-access-refresh.conf
+
+# Data files (might contain sensitive data)
+/dataFromApi/*.csv
+/dataFromApi/*.json
+

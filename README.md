@@ -20,6 +20,7 @@ Temporary "Install" section:
    ```conf
     api-key=your.api.key.all.in.one-line
     ```
+   * Alternatively copy the `example-api-key.conf` and rename it to `api-key.conf` with your api-key in it.
 4. Run `mvn clean install -DisMavenSurefireTesting=true`
 
 ## Usage

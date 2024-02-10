@@ -3,6 +3,7 @@ package me.noitcereon.external.api.eloverblik;
 import me.noitcereon.configuration.SimpleConfigLoader;
 import me.noitcereon.configuration.SimpleConfigSaver;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -25,12 +26,16 @@ class ElOverblikApiControllerTest {
         assertNotNull(accessToken);
         LOG.info(accessToken);
     }
-    @Test
-    void givenNothing_WhenRetrievingDataAccessToken_ThenAccessTokenIsExactly3451Chars() {
-        int expectedTokenStringLength = 3451; // Note: I am unsure if the length of the data access token is a constant.
-        String accessToken = controller.retrieveDataAccessToken();
-        int actualLength = accessToken.length();
 
-        assertEquals(expectedTokenStringLength, actualLength);
+    /**
+     * This test is just an attempt to verify if the token is at least somewhat correct. Not a very good test probably...
+     */
+    @Test
+    void givenNothing_WhenRetrievingDataAccessToken_ThenAccessTokenIsAbove3400Chars() {
+        int expectedMinTokenLength = 3400; // Note: The token is not a constant length.
+        String accessToken = controller.retrieveDataAccessToken();
+        int actualTokenLength = accessToken.length();
+
+        assertTrue(expectedMinTokenLength < actualTokenLength);
     }
 }

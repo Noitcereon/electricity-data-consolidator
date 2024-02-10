@@ -2,6 +2,7 @@ package me.noitcereon.external.api.eloverblik.models;
 
 import java.util.List;
 
+@EloverblikApiModel
 public class MeteringPointApiDto {
     private String meteringPointId;
     private String typeOfMP;
@@ -96,6 +97,7 @@ public class MeteringPointApiDto {
     public void setDataAccessCVR(String dataAccessCVR) {
         this.dataAccessCVR = dataAccessCVR;
     }
+
     public List<ChildMeteringPointDto> getChildMeteringPoints() {
         return childMeteringPoints;
     }

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @JsonSchemaModel(documentationUrl = "https://api.eloverblik.dk/CustomerApi/index.html")
 @Documented
 @Target(ElementType.TYPE)
-public @interface EloverblikApiModel {
+@interface EloverblikApiModel {
 
 }
 

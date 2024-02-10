@@ -1,5 +1,6 @@
 package me.noitcereon.external.api.eloverblik;
 
+import me.noitcereon.CustomJunitTag;
 import me.noitcereon.configuration.SimpleConfigLoader;
 import me.noitcereon.configuration.SimpleConfigSaver;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Tag("IntegrationTest")
+@Tag(CustomJunitTag.INTEGRATION_TEST)
 class ElOverblikApiControllerTest {
 
     private static ElOverblikApiController controller;

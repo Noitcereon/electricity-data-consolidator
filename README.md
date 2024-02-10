@@ -9,8 +9,19 @@ The idea is to get the data and make the accumulated data available in different
 
 This project is still in its infancy and does not have any working parts yet.
 
-## Installation
+## Install
 Not ready for installation.
+
+Temporary "Install" section:
+
+1. Get API key for ElOverblikAPI
+2. `cd /config`
+3. Make file called `api-key.conf` with content similar to:
+   ```conf
+    api-key=your.api.key.all.in.one-line
+    ```
+   * Alternatively copy the `example-api-key.conf` and rename it to `api-key.conf` with your api-key in it.
+4. Run `mvn clean install -DisMavenSurefireTesting=true`
 
 ## Usage
 Not ready for usage.

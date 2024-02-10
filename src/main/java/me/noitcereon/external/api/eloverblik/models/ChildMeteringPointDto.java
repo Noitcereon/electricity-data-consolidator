@@ -1,5 +1,6 @@
 package me.noitcereon.external.api.eloverblik.models;
 
+@EloverblikApiModel
 public class ChildMeteringPointDto {
     private String parentMeteringPointId;
     private String meteringPointId;

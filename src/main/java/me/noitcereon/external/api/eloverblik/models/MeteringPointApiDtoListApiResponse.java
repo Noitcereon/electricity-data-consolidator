@@ -2,6 +2,7 @@ package me.noitcereon.external.api.eloverblik.models;
 
 import java.util.List;
 
+@EloverblikApiModel
 public class MeteringPointApiDtoListApiResponse {
     private List<MeteringPointApiDto> result;
 

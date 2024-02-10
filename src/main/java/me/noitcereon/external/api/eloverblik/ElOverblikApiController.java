@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles all calls to the "El Overblik" API.
@@ -50,7 +51,7 @@ public class ElOverblikApiController {
     public String retrieveDataAccessToken(){
         return dataAccessTokenManager.retrieveDataAccessToken();
     }
-    public List<MeteringPointApiDto> getMeteringPoints(boolean includeAll){
+    public Optional<List<MeteringPointApiDto>> getMeteringPoints(boolean includeAll){
         try {
             return meteringPointManager.getMeteringPoints(includeAll);
         } catch (IOException e) {

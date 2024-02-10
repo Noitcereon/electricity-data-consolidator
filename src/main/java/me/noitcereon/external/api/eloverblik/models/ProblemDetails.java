@@ -1,5 +1,6 @@
 package me.noitcereon.external.api.eloverblik.models;
 
+@EloverblikApiModel
 public class ProblemDetails {
     private String type;
     private String title;

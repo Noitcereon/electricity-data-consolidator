@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 
 public class MeteringPointManager {
     private ConfigurationLoader configLoader;
@@ -34,7 +35,7 @@ public class MeteringPointManager {
      * @param includeAll When includeAll is false, only the metering points with relations are returned. When includeAll is true the list will be a merge of the related metering points with a lookup using CPR or CVR. CPR is used if you are private user. CVR is used if you access as an employee.
      * @return Returns a list of metering points.
      */
-    public List<MeteringPointApiDto> getMeteringPoints(boolean includeAll) throws IOException, InterruptedException {
+    public Optional<List<MeteringPointApiDto>> getMeteringPoints(boolean includeAll) throws IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -45,15 +46,14 @@ public class MeteringPointManager {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if(response.statusCode() != 200){
-            ElectricityConsolidatorRuntimeException exception = new ElectricityConsolidatorRuntimeException("Request to endpoint " + request.uri() + " did not return 200 OK response.");
-            LOG.error(exception.getMessage(), exception);
-            throw exception;
+        if (response.statusCode() != 200) {
+            LOG.warn("Request to endpoint '{}' did not return 200 OK response. It instead returned HTTP Status '{}'", request.uri(), response.statusCode());
+            return Optional.empty();
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         MeteringPointApiDtoListApiResponse responseBody = mapper.readValue(response.body(), MeteringPointApiDtoListApiResponse.class);
 
-        return responseBody.getResult();
+        return Optional.of(responseBody.getResult());
     }
 }

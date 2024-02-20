@@ -32,7 +32,10 @@ public class MeteringPointManager {
     }
 
     /**
-     * @param includeAll When includeAll is false, only the metering points with relations are returned. When includeAll is true the list will be a merge of the related metering points with a lookup using CPR or CVR. CPR is used if you are private user. CVR is used if you access as an employee.
+     * @param includeAll When includeAll is false, only the metering points with relations are returned.
+     *                   When includeAll is true the list will be a merge of the related metering points with a lookup
+     *                   using CPR or CVR. CPR is used if you are private user.
+     *                   CVR is used if you access as an employee.
      * @return Returns a list of metering points.
      */
     public Optional<List<MeteringPointApiDto>> getMeteringPoints(boolean includeAll) throws IOException, InterruptedException {

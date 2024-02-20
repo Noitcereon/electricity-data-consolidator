@@ -13,3 +13,4 @@ last-data-access-refresh.conf
 /dataFromApi/*.csv
 /dataFromApi/*.json
 
+/temp

@@ -28,6 +28,20 @@ public class ApiModelToDataFileConverterTest {
         unitUnderTest.createCsvFile(tempList, "tempModel.csv");
     }
     @Test
+    public void givenModeldata_WhenConvertingToCsvFile_ThenDataWrittenMatchesDataGiven() throws IOException {
+        // TODO: Implement Model to CSV conversion and this test. (test part)
+        /*
+            Use test data (based on real api model) to convert into CSV file.
+            Then, make assertions that the CSV file contains the same data.
+         */
+
+        // Act
+        // unitUnderTest.createCsvFile(testData, "givenModeldata_WhenConvertingToCsvFile_ThenDataWrittenMatchesDataGiven.csv");
+
+        // Assert
+        Assertions.fail("Conversion from datamodel to CSV file has not been implemented yet.");
+    }
+    @Test
     public void givenModelData_WhenConvertingToJsonFile_ThenFileIsCreated() throws IOException {
         MethodOutcome expectedOutcome = MethodOutcome.SUCCESS;
         TempModel model = new TempModel();

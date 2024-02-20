@@ -30,7 +30,7 @@ public class ApiModelToDataFileConverter {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
             for (T model : dataModels) {
-                writer.write(model.toString());
+                writer.write(model.toString()); // TODO Implement Model to CSV conversion and this test. toString() is not really a valid option.
             }
             writer.flush();
         }

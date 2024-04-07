@@ -6,7 +6,8 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.1.0-alpha.0.1.0</version> <!-- Semantic Versioning -->
+    <version>0.1.0-alpha.0.2.0</version> <!-- Semantic Versioning -->
+    <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -48,6 +49,30 @@
                 <!-- Maven's official test framework -->
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire-version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        me.noitcereon.Main
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

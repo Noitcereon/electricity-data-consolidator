@@ -80,6 +80,16 @@ public class ElOverblikApiController {
     }
 
     public MethodOutcome getMeterDataCsvFile(List<MeteringPointApiDto> meteringPoints, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
-        return meterDataManager.getMeterDataInPeriodAsCsv(meteringPoints, dateFrom, dateTo, aggregationUnit);
+        MethodOutcome result = meterDataManager.getMeterDataInPeriodAsCsv(meteringPoints, dateFrom, dateTo, aggregationUnit);
+        if(result == MethodOutcome.SUCCESS){
+            LOG.info("""
+                    MeterData from the following MeteringPoints: {}
+                    in the following period:
+                    From date: {}
+                    To date: {}
+                    was saved in CSV file based on hourly data.
+                    """, meteringPoints, dateFrom, dateTo);
+        }
+        return result;
     }
 }

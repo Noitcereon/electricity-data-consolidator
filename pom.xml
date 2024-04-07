@@ -6,7 +6,7 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.1.0-alpha.0.1.0</version> <!-- Semantic Versioning -->
+    <version>0.1.0-alpha.0.2.0</version> <!-- Semantic Versioning -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

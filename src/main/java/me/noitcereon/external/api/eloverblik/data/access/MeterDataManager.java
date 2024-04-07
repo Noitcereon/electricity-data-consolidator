@@ -72,6 +72,7 @@ public class MeterDataManager {
 
             // Prepare for file for response
             Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
+            Files.createDirectory(fileDirectory);
             String uniqueFileName = "meterdata" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hhmmss", Locale.ROOT)) + ".csv";
             Path csvFilePath = Files.createFile(Path.of(fileDirectory.toString(), uniqueFileName));
 

@@ -22,8 +22,16 @@ public class Main {
                 option = nextScreen.displayScreenAndAskForInput();
                 appLoops++;
             }
-        } catch (Exception e) {
+        }
+        catch (NumberFormatException numberFormatEx){
+            LOG.error("Couldn't parse the given input as a number");
+            main(new String[]{""});
+        }
+        catch (Exception e) {
             LOG.error("An error occurred, which the application was not built to handle. Showing information that can help debug the problem: ", e);
+        }
+        finally {
+            Screen.getScannerInstance().close();
         }
     }
 }

@@ -1,40 +1,37 @@
 package me.noitcereon;
 
 
-import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
-import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
-import me.noitcereon.external.api.eloverblik.TimeAggregation;
-import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
+import me.noitcereon.console.ui.Screen;
+import me.noitcereon.console.ui.ScreenFactory;
+import me.noitcereon.console.ui.ScreenOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
-        try{
-            System.out.println("Welcome to this unfinished console application.");
-            System.out.println("The intention is to make a simple application, which can ");
-            System.out.println("retrieve data from various electricty data APIs.");
-
-            ElOverblikApiController elOverblikApi = new ElOverblikApiController();
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
-            if(meteringPoints.isEmpty()){
-                LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
-                throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+        try {
+            Screen mainMenu = ScreenFactory.createMainMenu();
+            ScreenOption option = mainMenu.displayScreenAndAskForInput();
+            int allowedAppLoops = 500000; // safeguard against infinite loop.
+            int appLoops = 0;
+            while (appLoops < allowedAppLoops) { // Application loop. It can be stopped via a menu option (See the ScreenOptionFactory.exitApplication() method)
+                Screen nextScreen = option.execute();
+                option = nextScreen.displayScreenAndAskForInput();
+                appLoops++;
             }
-            elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), LocalDate.now().minusDays(2), LocalDate.now().minusDays(1), TimeAggregation.HOUR);
-            System.out.println("Press ENTER to exit...");
-            System.in.read(); // intentionally ignored.
-            System.out.println("Exiting...");
         }
-        catch (Exception e){
-            LOG.error("An error occurred, which the application was not built to handle. Showing exception message and StackTrace:");
-            LOG.error(e.getMessage(), e);
+        catch (NumberFormatException numberFormatEx){
+            LOG.error("Couldn't parse the given input as a number");
+            main(new String[]{""});
         }
-
+        catch (Exception e) {
+            LOG.error("An error occurred, which the application was not built to handle. Showing information that can help debug the problem: ", e);
+        }
+        finally {
+            Screen.getScannerInstance().close();
+        }
     }
 }

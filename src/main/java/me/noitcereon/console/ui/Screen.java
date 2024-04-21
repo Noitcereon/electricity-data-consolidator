@@ -10,7 +10,9 @@ import java.util.Scanner;
 public class Screen {
 
     private final String headLine;
+    private final String content;
     private final Map<Integer, ScreenOption> menuOptions;
+
     /**
      * Creates a scanner that takes System.in input. It should only be closed, when the application exits.
      */
@@ -18,6 +20,7 @@ public class Screen {
 
     public Screen() {
         this.headLine = "Template Screen";
+        this.content = "";
         this.menuOptions = new HashMap<>();
         this.menuOptions.put(0, ScreenOptionFactory.exitApplication());
         this.menuOptions.put(1, ScreenOptionFactory.mainMenuOption());
@@ -26,11 +29,24 @@ public class Screen {
     public Screen(String headLine, Map<Integer, ScreenOption> menuOptions) {
         this.headLine = headLine;
         this.menuOptions = menuOptions;
+        this.content = "";
         menuOptions.put(0, ScreenOptionFactory.exitApplication());
+    }
+    public Screen(String headLine, String content, Map<Integer, ScreenOption> menuOptions){
+        this.headLine = headLine;
+        this.content = content;
+        this.menuOptions = menuOptions;
+        menuOptions.put(0, ScreenOptionFactory.exitApplication());
+    }
+    public static Scanner getScannerInstance(){
+        return SCANNER;
     }
 
     public String getHeadLine() {
         return headLine;
+    }
+    public String getContent(){
+        return content;
     }
 
     public Map<Integer, ScreenOption> getMenuOptions() {
@@ -39,6 +55,7 @@ public class Screen {
 
     public String getDisplayString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(getContent()).append(System.lineSeparator());
         for (Map.Entry<Integer, ScreenOption> entry : menuOptions.entrySet()) {
             sb.append("[").append(entry.getKey()).append("]")
                     .append(" ").append(entry.getValue())

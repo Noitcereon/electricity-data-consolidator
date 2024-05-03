@@ -18,14 +18,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public class MeterDataManager {
@@ -75,8 +74,8 @@ public class MeterDataManager {
             if(!fileDirectory.toFile().exists()){
                 Files.createDirectory(fileDirectory);
             }
-            String uniqueFileName = "meterdata" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-hhmmss", Locale.ROOT)) + ".csv";
-            Path csvFilePath = Files.createFile(Path.of(fileDirectory.toString(), uniqueFileName));
+            String fileName = "meterdata" + dateFrom.format(DateTimeFormatter.ISO_DATE) + "-"+dateTo.format(DateTimeFormatter.ISO_DATE) + ".csv";
+            Path csvFilePath = Files.createFile(Path.of(fileDirectory.toString(), fileName));
 
             HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
             if (response.statusCode() == 200) {
@@ -85,7 +84,11 @@ public class MeterDataManager {
             }
             LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
             LOG.warn("Response to request: {}", response);
-        } catch (IOException | InterruptedException e) {
+        }
+        catch (FileAlreadyExistsException ex){
+            LOG.info("You've already fetched data for this period (see file: '%s'".formatted(ex.getFile()));
+        }
+        catch (IOException | InterruptedException e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
             Thread.currentThread().interrupt();

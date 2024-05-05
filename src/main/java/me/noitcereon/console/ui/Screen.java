@@ -65,7 +65,7 @@ public class Screen {
     }
 
     private void displayHeaderAndMenu() {
-        System.out.println(headLine);
+        System.out.println("#### " + getHeadLine().toUpperCase() + " ####");
         System.out.println(getDisplayString());
     }
 

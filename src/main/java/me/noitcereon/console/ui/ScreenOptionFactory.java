@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,21 +45,26 @@ public class ScreenOptionFactory {
     }
     public static ScreenOption fetchMeterDataCustomPeriod(){
         return new ScreenOption("Fetch meterdata from a period you define", () -> {
-            System.out.println("Enter dateFrom in format YYYY-MM-DD");
-            LocalDate dateFrom = LocalDate.parse(Screen.getScannerInstance().nextLine());
-            System.out.println("Enter dateTo in format YYYY-MM-DD");
-            LocalDate dateTo = LocalDate.parse(Screen.getScannerInstance().nextLine());
-            ElOverblikApiController elOverblikApi = new ElOverblikApiController();
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
-            if(meteringPoints.isEmpty()){
-                LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
-                throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+            try{
+                System.out.println("Enter dateFrom in format YYYY-MM-DD");
+                LocalDate dateFrom = LocalDate.parse(Screen.getScannerInstance().nextLine());
+                System.out.println("Enter dateTo in format YYYY-MM-DD");
+                LocalDate dateTo = LocalDate.parse(Screen.getScannerInstance().nextLine());
+                ElOverblikApiController elOverblikApi = new ElOverblikApiController();
+                Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
+                if(meteringPoints.isEmpty()){
+                    LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
+                    throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+                }
+                MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
+                if(outcome.equals(MethodOutcome.SUCCESS)){
+                    return ScreenFactory.resultScreen("MeterData was saved to file.");
+                }
+                return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
+            }catch (DateTimeParseException parseException){
+                System.err.println("Failed to parse input as date ("+ parseException.getMessage()+ ") . Going back to main menu.");
+                return ScreenFactory.createMainMenu();
             }
-            MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
-            if(outcome.equals(MethodOutcome.SUCCESS)){
-                return ScreenFactory.resultScreen("MeterData was saved to file.");
-            }
-            return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });
     }
     public static ScreenOption showResult(String resultDisplayText){

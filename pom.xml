@@ -67,6 +67,10 @@
                                     </mainClass>
                                 </manifest>
                             </archive>
+                            <descriptors>
+                                <!-- Make distribution .zip file (containing application executable and scripts to start it with -->
+                                <descriptor>/src/assembly/custom-maven-assembly-descriptor.xml</descriptor>
+                            </descriptors>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>

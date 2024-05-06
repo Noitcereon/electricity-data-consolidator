@@ -29,6 +29,9 @@ public class Main {
         }
         catch (Exception e) {
             LOG.error("An error occurred, which the application was not built to handle. Showing information that can help debug the problem: ", e);
+            System.out.println("### Press ENTER to close the application ####");
+            Screen.getScannerInstance().nextLine();
+            System.exit(1);
         }
         finally {
             Screen.getScannerInstance().close();

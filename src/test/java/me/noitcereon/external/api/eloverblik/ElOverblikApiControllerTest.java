@@ -6,10 +6,7 @@ import me.noitcereon.configuration.SimpleConfigLoader;
 import me.noitcereon.configuration.SimpleConfigSaver;
 import me.noitcereon.external.api.eloverblik.models.MeterDataReadingsDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +59,7 @@ class ElOverblikApiControllerTest {
         Assertions.assertNotEquals(unexpectedMeteringPointId, meteringPointId);
     }
     @Test
+    @Disabled("Because it is not implemented yet.")
     void givenDataAccessToken_WhenRetrievingMeterData_ThenResponseWithDataIsReturned(){
         // Arrange
         LocalDate dateFrom = LocalDate.of(2024, Month.FEBRUARY, 18);
@@ -75,6 +73,7 @@ class ElOverblikApiControllerTest {
         // maybe more assertions?
     }
     @Test
+    @Disabled("Because it is not implemented yet.")
     void givenDataAccessToken_WhenRetrievingMeterData_ThenResponseWithDataIsReturnedAsCsv(){
         // Arrange
         LocalDate dateFrom = LocalDate.of(2024, Month.FEBRUARY, 18);

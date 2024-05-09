@@ -28,6 +28,7 @@ public class ApiModelToDataFileConverterTest {
         unitUnderTest.createCsvFile(tempList, "tempModel.csv");
     }
     @Test
+    @Disabled("Because this feature has not been implemented yet.")
     public void givenModeldata_WhenConvertingToCsvFile_ThenDataWrittenMatchesDataGiven() throws IOException {
         // TODO: Implement Model to CSV conversion and this test. (test part)
         /*

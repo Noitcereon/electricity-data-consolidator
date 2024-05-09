@@ -75,7 +75,12 @@ public class MeterDataManager {
                 Files.createDirectory(fileDirectory);
             }
             String fileName = "meterdata" + dateFrom.format(DateTimeFormatter.ISO_DATE) + "-"+dateTo.format(DateTimeFormatter.ISO_DATE) + ".csv";
-            Path csvFilePath = Files.createFile(Path.of(fileDirectory.toString(), fileName));
+            Path filePath = Path.of(fileDirectory.toString(), fileName);
+            if(filePath.toFile().exists()){
+                // We already have the data, so no need to fetch it a second time.
+                return MethodOutcome.SUCCESS;
+            }
+            Path csvFilePath = Files.createFile(filePath);
 
             HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
             if (response.statusCode() == 200) {

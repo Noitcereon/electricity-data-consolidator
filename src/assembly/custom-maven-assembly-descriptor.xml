@@ -22,7 +22,7 @@
     </fileSets>
     <files>
         <file>
-            <source>/README.md</source>
+            <source>README.md</source>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>

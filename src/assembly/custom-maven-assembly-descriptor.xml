@@ -6,6 +6,20 @@
     <formats>
         <format>zip</format>
     </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/config</directory>
+            <outputDirectory>/config</outputDirectory>
+            <excludes>
+                <exclude>api-key.conf</exclude>
+                <exclude>last-data-access-refresh.conf</exclude>
+                <exclude>data-access-token.conf</exclude>
+                <!-- The two .conf files below are created through unit tests  -->
+                <exclude>simpleConfigLoaderTest.conf</exclude>
+                <exclude>simple-config-saver-key.conf</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
     <files>
         <file>
             <source>/README.md</source>

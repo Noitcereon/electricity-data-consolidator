@@ -22,21 +22,21 @@
     </fileSets>
     <files>
         <file>
-            <source>README.md</source>
+            <source>${project.basedir}/README.md</source>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>/src/assembly/assembly-assets/start.cmd</source>
-            <outputDirectory>/</outputDirectory>
-            <filtered>true</filtered> <!-- Enables maven variable substitution in the source file -->
-        </file>
-        <file>
-            <source>/src/assembly/assembly-assets/start.sh</source>
+            <source>${project.basedir}/src/assembly/assembly-assets/start.cmd</source>
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered> <!-- Enables maven variable substitution in the source file -->
         </file>
         <file>
-            <source>/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>
+            <source>${project.basedir}/src/assembly/assembly-assets/start.sh</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered> <!-- Enables maven variable substitution in the source file -->
+        </file>
+        <file>
+            <source>${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>

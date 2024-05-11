@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,8 @@ public class ScreenOptionFactory {
             }
             MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
             if(outcome.equals(MethodOutcome.SUCCESS)){
-                return ScreenFactory.resultScreen("MeterData was saved to file.");
+                String fileName = "meterdata" + dayBeforeYesterDay.format(DateTimeFormatter.ISO_DATE) + "-"+yesterday.format(DateTimeFormatter.ISO_DATE) + ".csv";
+                return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
             }
             return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });

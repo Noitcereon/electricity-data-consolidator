@@ -1,6 +1,7 @@
 package me.noitcereon.console.ui;
 
 import me.noitcereon.MethodOutcome;
+import me.noitcereon.configuration.*;
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
@@ -21,6 +22,8 @@ import static me.noitcereon.console.ui.ScreenFactory.resultScreen;
  */
 public class ScreenOptionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ScreenOptionFactory.class);
+    private static ConfigurationLoader configLoader = SimpleConfigLoader.getInstance();
+    private static ConfigurationSaver configSaver = SimpleConfigSaver.getInstance();
     private ScreenOptionFactory(){
         // Don't instantiate, because the ScreenOptions should only be available through static methods.
     }
@@ -48,6 +51,30 @@ public class ScreenOptionFactory {
     protected static Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
         String fileName = "meterdata" + fromDate.format(DateTimeFormatter.ISO_DATE) + "-"+ toDate.format(DateTimeFormatter.ISO_DATE) + ".csv";
         return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
+    }
+
+    public static ScreenOption fetchMeterDataBasedOnLastFetchTime(){
+        LocalDate latestFetchDate = LocalDate.now().minusDays(2);
+        Optional<String> latestFetchDateFromConf =  configLoader.getProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE);
+        if(latestFetchDateFromConf.isPresent()){
+            latestFetchDate = LocalDate.parse(latestFetchDateFromConf.get());
+        }
+        LocalDate fromDate = latestFetchDate;
+        LocalDate toDate = LocalDate.now().minusDays(1);
+        return new ScreenOption("Fetch MeterData based on latest fetch date (from %s to %s)".formatted(fromDate, toDate), () -> {
+            ElOverblikApiController elOverblikApi = new ElOverblikApiController();
+            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
+            if(meteringPoints.isEmpty()){
+                LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
+                throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+            }
+            MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), fromDate, toDate, TimeAggregation.HOUR);
+            if(outcome.equals(MethodOutcome.SUCCESS)){
+                System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
+                return displayMeterDataSuccessResultScreen(fromDate, toDate);
+            }
+            return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
+        });
     }
     public static ScreenOption fetchMeterDataCustomPeriod(){
         return new ScreenOption("Fetch meterdata from a period you define", () -> {

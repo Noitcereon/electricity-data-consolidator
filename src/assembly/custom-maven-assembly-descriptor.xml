@@ -19,6 +19,10 @@
                 <exclude>simple-config-saver-key.conf</exclude>
             </excludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/documentation</directory>
+            <outputDirectory>/documentation</outputDirectory>
+        </fileSet>
     </fileSets>
     <files>
         <file>

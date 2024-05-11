@@ -53,7 +53,7 @@ The one we're interested in is called `electricity-data-consolidator-{version}-d
 Simply open the application via `start.cmd` (if using Windows) or `start.sh` (on Linux/Mac) and you should
 see a screen similar to below:
 
-![screenshot-of-console-ui.png](Documentation/assets/main-readme/screenshot-of-console-ui.png)
+![screenshot-of-console-ui.png](documentation/assets/main-readme/screenshot-of-console-ui.png)
 
 Then you simply select an option from the list by writing the associate number in the brackets, e.g. [1] for option 1.
 and press ENTER to confirm your choice.

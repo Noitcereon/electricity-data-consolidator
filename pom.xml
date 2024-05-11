@@ -6,7 +6,12 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.1.0-alpha.0.2.0</version> <!-- Semantic Versioning -->
+    <version>0.1.0-alpha-2</version> <!-- Semantic Versioning -->
+    <!-- Public API: Anything that can be directly interacted with as a user. Below are a few examples:
+      1. Console-UI
+      2. Configuration files
+      3. Naming convention of data files fetched and their location
+      -->
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

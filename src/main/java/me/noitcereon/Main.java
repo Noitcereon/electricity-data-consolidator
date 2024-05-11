@@ -4,6 +4,7 @@ package me.noitcereon;
 import me.noitcereon.console.ui.Screen;
 import me.noitcereon.console.ui.ScreenFactory;
 import me.noitcereon.console.ui.ScreenOption;
+import me.noitcereon.exceptions.MissingApiKeyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try {
             Screen mainMenu = ScreenFactory.createMainMenu();
             ScreenOption option = mainMenu.displayScreenAndAskForInput();
@@ -22,6 +23,10 @@ public class Main {
                 option = nextScreen.displayScreenAndAskForInput();
                 appLoops++;
             }
+        }
+        catch (MissingApiKeyException apiKeyException){
+            System.err.println(apiKeyException.getMessage());
+            Thread.sleep(5000);
         }
         catch (NumberFormatException numberFormatEx){
             LOG.error("Couldn't parse the given input as a number");

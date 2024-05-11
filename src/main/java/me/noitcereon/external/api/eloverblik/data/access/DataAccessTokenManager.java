@@ -3,6 +3,7 @@ package me.noitcereon.external.api.eloverblik.data.access;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.noitcereon.configuration.*;
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
+import me.noitcereon.exceptions.MissingApiKeyException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.models.StringApiResponse;
 import me.noitcereon.utilities.DateConverter;
@@ -43,6 +44,10 @@ public class DataAccessTokenManager {
             URI getDataAccessTokenEndPoint = new URI(ElOverblikApiEndpoint.DATA_ACCESS_TOKEN);
             HttpClient httpClient = HttpClient.newHttpClient();
 
+            String apiKey = configLoader.getApiKey();
+            if(apiKey.isEmpty()){
+                throw new MissingApiKeyException("Could not retrieve El Overblik API key. Have you updated /config/api-key.conf? See README.md if in doubt about what it needs.");
+            }
             HttpRequest httpRequest =
                     HttpRequest.newBuilder(getDataAccessTokenEndPoint)
                             .header("Authorization", "Bearer " + configLoader.getApiKey())

@@ -29,11 +29,13 @@
             <source>${project.basedir}/src/assembly/assembly-assets/start.cmd</source>
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered> <!-- Enables maven variable substitution in the source file -->
+            <fileMode>771</fileMode>
         </file>
         <file>
             <source>${project.basedir}/src/assembly/assembly-assets/start.sh</source>
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered> <!-- Enables maven variable substitution in the source file -->
+            <fileMode>771</fileMode>
         </file>
         <file>
             <source>${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>

@@ -39,11 +39,15 @@ public class ScreenOptionFactory {
             }
             MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
             if(outcome.equals(MethodOutcome.SUCCESS)){
-                String fileName = "meterdata" + dayBeforeYesterDay.format(DateTimeFormatter.ISO_DATE) + "-"+yesterday.format(DateTimeFormatter.ISO_DATE) + ".csv";
-                return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
+                return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday);
             }
             return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });
+    }
+
+    protected static Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
+        String fileName = "meterdata" + fromDate.format(DateTimeFormatter.ISO_DATE) + "-"+ toDate.format(DateTimeFormatter.ISO_DATE) + ".csv";
+        return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
     }
     public static ScreenOption fetchMeterDataCustomPeriod(){
         return new ScreenOption("Fetch meterdata from a period you define", () -> {
@@ -60,7 +64,7 @@ public class ScreenOptionFactory {
                 }
                 MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
                 if(outcome.equals(MethodOutcome.SUCCESS)){
-                    return ScreenFactory.resultScreen("MeterData was saved to file.");
+                    return displayMeterDataSuccessResultScreen(dateFrom, dateTo);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
             }catch (DateTimeParseException parseException){

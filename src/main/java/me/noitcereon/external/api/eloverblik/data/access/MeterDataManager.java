@@ -10,6 +10,7 @@ import me.noitcereon.external.api.eloverblik.TimeAggregation;
 import me.noitcereon.external.api.eloverblik.models.MeterDataReadingsDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
+import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,8 +74,8 @@ public class MeterDataManager {
             if(!fileDirectory.toFile().exists()){
                 Files.createDirectory(fileDirectory);
             }
-            String fileName = "meterdata" + dateFrom.format(DateTimeFormatter.ISO_DATE) + "-"+dateTo.format(DateTimeFormatter.ISO_DATE) + ".csv";
-            Path filePath = Path.of(fileDirectory.toString(), fileName);
+
+            Path filePath = Path.of(fileDirectory.toString(), FileNameGenerator.meterDataCsvFile(dateFrom, dateTo));
             if(filePath.toFile().exists()){
                 // We already have the data, so no need to fetch it a second time.
                 return MethodOutcome.SUCCESS;

@@ -6,6 +6,7 @@ import me.noitcereon.configuration.ConfigurationLoader;
 import me.noitcereon.configuration.ConfigurationSaver;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
+import me.noitcereon.utilities.FileNameGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ class ScreenOptionFactoryTest {
         Mockito.when(mockElOverblikApi.getMeterDataCsvFile(Mockito.any(), eq(fetchDataFromDate), eq(fetchDataToDate), eq(TimeAggregation.HOUR)))
                 .thenReturn(MethodOutcome.SUCCESS);
 
-        String expectedContent = "MeterData was saved to 'meterdata2024-01-01-" + fetchDataToDate + ".csv'";
+        String expectedContent = "MeterData was saved to '%s'".formatted(FileNameGenerator.meterDataCsvFile(fetchDataFromDate, fetchDataToDate));
 
         ScreenOption optionUnderTest = screenOptionFactory.fetchMeterDataBasedOnLastFetchTime();
 

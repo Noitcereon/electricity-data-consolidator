@@ -15,26 +15,37 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
-import static me.noitcereon.console.ui.ScreenFactory.resultScreen;
-
 /**
  * Contains the available options for the application.
  */
 public class ScreenOptionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(ScreenOptionFactory.class);
-    private static ConfigurationLoader configLoader = SimpleConfigLoader.getInstance();
-    private static ConfigurationSaver configSaver = SimpleConfigSaver.getInstance();
-    private ScreenOptionFactory(){
-        // Don't instantiate, because the ScreenOptions should only be available through static methods.
+    private final ConfigurationLoader configLoader;
+    private final ConfigurationSaver configSaver;
+    private final ElOverblikApiController elOverblikApi;
+
+    public ScreenOptionFactory(){
+        configLoader =  SimpleConfigLoader.getInstance();
+        configSaver = SimpleConfigSaver.getInstance();
+        this.elOverblikApi = new ElOverblikApiController();
     }
-    public static ScreenOption mainMenuOption() {
+    public ScreenOptionFactory(ElOverblikApiController elOverblikApiController){
+        configLoader = SimpleConfigLoader.getInstance();
+        configSaver = SimpleConfigSaver.getInstance();
+        this.elOverblikApi = elOverblikApiController;
+    }
+    public ScreenOptionFactory(ConfigurationLoader configLoader, ConfigurationSaver configSaver, ElOverblikApiController elOverblikApiController){
+        this.configLoader = configLoader;
+        this.configSaver = configSaver;
+        this.elOverblikApi = elOverblikApiController;
+    }
+    public ScreenOption mainMenuOption() {
         return new ScreenOption("Displays the main menu", () -> ScreenFactory.createMainMenu().displayScreenAndAskForInput().execute());
     }
-    public static ScreenOption fetchMeterData(){
+    public ScreenOption fetchMeterData(){
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDate dayBeforeYesterDay = yesterday.minusDays(1);
         return new ScreenOption("Fetch meterdata from yesterday (" + yesterday + ")", () -> {
-            ElOverblikApiController elOverblikApi = new ElOverblikApiController();
             Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
             if(meteringPoints.isEmpty()){
                 LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
@@ -48,12 +59,12 @@ public class ScreenOptionFactory {
         });
     }
 
-    protected static Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
+    protected Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
         String fileName = "meterdata" + fromDate.format(DateTimeFormatter.ISO_DATE) + "-"+ toDate.format(DateTimeFormatter.ISO_DATE) + ".csv";
         return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
     }
 
-    public static ScreenOption fetchMeterDataBasedOnLastFetchTime(){
+    public ScreenOption fetchMeterDataBasedOnLastFetchTime(){
         LocalDate latestFetchDate = LocalDate.now().minusDays(2);
         Optional<String> latestFetchDateFromConf =  configLoader.getProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE);
         if(latestFetchDateFromConf.isPresent()){
@@ -62,7 +73,6 @@ public class ScreenOptionFactory {
         LocalDate fromDate = latestFetchDate;
         LocalDate toDate = LocalDate.now().minusDays(1);
         return new ScreenOption("Fetch MeterData based on latest fetch date (from %s to %s)".formatted(fromDate, toDate), () -> {
-            ElOverblikApiController elOverblikApi = new ElOverblikApiController();
             Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
             if(meteringPoints.isEmpty()){
                 LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
@@ -76,14 +86,13 @@ public class ScreenOptionFactory {
             return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });
     }
-    public static ScreenOption fetchMeterDataCustomPeriod(){
+    public ScreenOption fetchMeterDataCustomPeriod(){
         return new ScreenOption("Fetch meterdata from a period you define", () -> {
             try{
                 System.out.println("Enter dateFrom in format YYYY-MM-DD");
                 LocalDate dateFrom = LocalDate.parse(Screen.getScannerInstance().nextLine());
                 System.out.println("Enter dateTo in format YYYY-MM-DD");
                 LocalDate dateTo = LocalDate.parse(Screen.getScannerInstance().nextLine());
-                ElOverblikApiController elOverblikApi = new ElOverblikApiController();
                 Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
                 if(meteringPoints.isEmpty()){
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
@@ -100,9 +109,7 @@ public class ScreenOptionFactory {
             }
         });
     }
-    public static ScreenOption showResult(String resultDisplayText){
-        return new ScreenOption("Displays the result of an action", () -> resultScreen(resultDisplayText));
-    }
+
     public static ScreenOption exitApplication(){
         return new ScreenOption("Exits the application.", () -> {
             System.exit(0);

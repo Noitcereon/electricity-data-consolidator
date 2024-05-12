@@ -19,11 +19,12 @@ public class Screen {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     public Screen() {
+        ScreenOptionFactory screenOptions = new ScreenOptionFactory();
         this.headLine = "Template Screen";
         this.content = "";
         this.menuOptions = new HashMap<>();
         this.menuOptions.put(0, ScreenOptionFactory.exitApplication());
-        this.menuOptions.put(1, ScreenOptionFactory.mainMenuOption());
+        this.menuOptions.put(1, screenOptions.mainMenuOption());
     }
 
     public Screen(String headLine, Map<Integer, ScreenOption> menuOptions) {

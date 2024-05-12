@@ -8,6 +8,7 @@ simpleConfigSaverTest.conf
 /src/main/resources/configuration.conf
 simple-config-saver-key.conf
 last-data-access-refresh.conf
+latest-meter-data-fetch-date.conf
 
 # Data files (might contain sensitive data)
 /dataFromApi/*.csv

@@ -36,6 +36,13 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         if (propertyCache.containsKey(key)) return Optional.of(propertyCache.get(key));
         return Optional.empty();
     }
+    @Override
+    public Optional<String> getProperty(String key, String fallbackValue) {
+        updateConfigurationFiles(key);
+        refreshCache();
+        if (propertyCache.containsKey(key)) return Optional.of(propertyCache.get(key));
+        return Optional.of(fallbackValue);
+    }
 
     private void updateConfigurationFiles(String key) {
         if(files.stream().noneMatch(knownConfFiles -> knownConfFiles.equals(key + ".conf"))){

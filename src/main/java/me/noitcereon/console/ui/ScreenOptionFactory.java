@@ -6,11 +6,11 @@ import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
+import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public class ScreenOptionFactory {
     }
 
     protected Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
-        String fileName = "meterdata" + fromDate.format(DateTimeFormatter.ISO_DATE) + "-"+ toDate.format(DateTimeFormatter.ISO_DATE) + ".csv";
+        String fileName = FileNameGenerator.meterDataCsvFile(fromDate, toDate);
         return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
     }
 

@@ -46,7 +46,7 @@ public class ScreenOptionFactory {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDate dayBeforeYesterDay = yesterday.minusDays(1);
         return new ScreenOption("Fetch meterdata from yesterday (" + yesterday + ")", () -> {
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
+            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
             if(meteringPoints.isEmpty()){
                 LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                 throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
@@ -73,7 +73,7 @@ public class ScreenOptionFactory {
         LocalDate fromDate = latestFetchDate;
         LocalDate toDate = LocalDate.now().minusDays(1);
         return new ScreenOption("Fetch MeterData based on latest fetch date (from %s to %s)".formatted(fromDate, toDate), () -> {
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
+            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
             if(meteringPoints.isEmpty()){
                 LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                 throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
@@ -93,7 +93,7 @@ public class ScreenOptionFactory {
                 LocalDate dateFrom = LocalDate.parse(Screen.getScannerInstance().nextLine());
                 System.out.println("Enter dateTo in format YYYY-MM-DD");
                 LocalDate dateTo = LocalDate.parse(Screen.getScannerInstance().nextLine());
-                Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(false);
+                Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
                 if(meteringPoints.isEmpty()){
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                     throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");

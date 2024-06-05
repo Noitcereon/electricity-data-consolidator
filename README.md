@@ -3,7 +3,7 @@
 # electricity-data-consolidator
 [![GitHub current branch CI Status](https://github.com/Noitcereon/electricity-data-consolidator/actions/workflows/maven.yml/badge.svg)](https://github.com/Noitcereon/electricity-data-consolidator/actions/workflows/maven.yml)
 
-An application that communicates with external APIs to retrieve their data automatically at certain intervals.
+An application that communicates with external APIs to retrieve their data automatically at certain intervals (NOTE: as of now it is not automatic and will happen via a Console interface)
 
 The idea is to get the data and make the accumulated data available in different formats (such as a .csv, .json or .xml file). This can then be used in e.g. an Excel sheet.
 

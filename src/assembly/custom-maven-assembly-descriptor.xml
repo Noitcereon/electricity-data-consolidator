@@ -14,6 +14,7 @@
                 <exclude>api-key.conf</exclude>
                 <exclude>last-data-access-refresh.conf</exclude>
                 <exclude>data-access-token.conf</exclude>
+                <exclude>latest-meter-data-fetch-date.conf</exclude>
                 <!-- The two .conf files below are created through unit tests  -->
                 <exclude>simpleConfigLoaderTest.conf</exclude>
                 <exclude>simple-config-saver-key.conf</exclude>

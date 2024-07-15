@@ -18,6 +18,10 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.surefire-version>3.1.0</maven.surefire-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- version-for-jpackage is used in /src/assembly/custom-jpackaging-input.jpack (it requires MAJOR.MINOR.BUILD, but since I don't have a BUILD I just give it 0) -->
+        <!-- jpackage docs: https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html -->
+        <version.for.jpackage>0.1.0</version.for.jpackage>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -103,6 +107,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <!-- Added due to jpackage input file (custom-jpackaging-input.jpack) -->
+                <directory>src/assembly/</directory>
+                <targetPath>../</targetPath>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
     <profiles>
         <profile>

@@ -14,9 +14,10 @@ This project is still in its infancy and thus only has very limited functionalit
 - Fetch MeterData from the El Overblik API as .csv file in custom period.
 
 ## Install
-This section is split in two: 
+This section is split in three: 
 1. How to install the application from a distribution .zip file (`electricity-data-consolidator-x-distribution.zip`)
 2. Making a distribution file from source code
+3. Making an installer for Windows with [jpackage](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html).
 
 ### Installation from zip file
 
@@ -47,13 +48,28 @@ The one we're interested in is called `electricity-data-consolidator-{version}-d
 
 2. Use the `electricity-data-consolidator-{version}-distribution.zip` as you want.
 
+### Making a Windows Installer with jpackage
+
+**Prerequisite**: [Wix v3.x CLI tool](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm).
+
+[jpackage](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html) is a CLI tool for creating installers.
+
+To use the tool you must:
+1. Build the application
+2. Navigate to target directory (where the executable jar with dependencies is located)
+3. Run the below CLI command (this gives jpackage the arguments needed to make a Windows installer)
+   ```
+   jpackage @custom-jpackaging-input.jpack --verbose
+   ```
+4. An .exe installer file should be created, which can be distributed.
+
 ## Usage
 > Prerequisites: Java 17 or later.
 
 Simply open the application via `start.cmd` (if using Windows) or `start.sh` (on Linux/Mac) and you should
 see a screen similar to below:
 
-![screenshot-of-console-ui.png](documentation/assets/main-readme/screenshot-of-console-ui.png)
+![screenshot-of-console-ui.png](./documentation/assets/main-readme/screenshot-of-console-ui.png)
 
 Then you simply select an option from the list by writing the associate number in the brackets, e.g. [1] for option 1.
 and press ENTER to confirm your choice.

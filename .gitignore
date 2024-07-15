@@ -15,3 +15,5 @@ latest-meter-data-fetch-date.conf
 /dataFromApi/*.json
 
 /temp
+
+*.exe

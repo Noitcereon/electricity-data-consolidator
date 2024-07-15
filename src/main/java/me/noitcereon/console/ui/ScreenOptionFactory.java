@@ -10,6 +10,7 @@ import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -61,7 +62,9 @@ public class ScreenOptionFactory {
 
     protected Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
         String fileName = FileNameGenerator.meterDataCsvFile(fromDate, toDate);
-        return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileName));
+        String dataDirectory = System.getProperty("user.dir") + File.separator + "dataFromApi" + File.separator;
+        String fileLocation = dataDirectory + fileName;
+        return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileLocation));
     }
 
     public ScreenOption fetchMeterDataBasedOnLastFetchTime(){

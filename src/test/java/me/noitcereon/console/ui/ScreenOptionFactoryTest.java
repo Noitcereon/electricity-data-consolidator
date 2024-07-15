@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -50,7 +51,9 @@ class ScreenOptionFactoryTest {
         Mockito.when(mockElOverblikApi.getMeterDataCsvFile(Mockito.any(), eq(fetchDataFromDate), eq(fetchDataToDate), eq(TimeAggregation.HOUR)))
                 .thenReturn(MethodOutcome.SUCCESS);
 
-        String expectedContent = "MeterData was saved to '%s'".formatted(FileNameGenerator.meterDataCsvFile(fetchDataFromDate, fetchDataToDate));
+        String dataDirectory = System.getProperty("user.dir") + File.separator + "dataFromApi" + File.separator;
+        String filePath = dataDirectory + FileNameGenerator.meterDataCsvFile(fetchDataFromDate, fetchDataToDate);
+        String expectedContent = "MeterData was saved to '%s'".formatted(filePath);
 
         ScreenOption optionUnderTest = screenOptionFactory.fetchMeterDataBasedOnLastFetchTime();
 

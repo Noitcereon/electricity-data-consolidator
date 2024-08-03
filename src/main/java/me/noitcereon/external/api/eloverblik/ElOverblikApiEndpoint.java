@@ -12,9 +12,13 @@ public class ElOverblikApiEndpoint {
     public static final String METERING_POINTS = BASE_URL + "meteringpoints/meteringpoints";
 
     private static final String METER_DATA_CSV = BASE_URL + "meterdata/timeseries/export/";
+    private static final String METER_DATA_RAW = BASE_URL + "/meterdata/gettimeseries/";
 
     public static String getMeterDataCsvEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit){
         return METER_DATA_CSV + dateFrom + "/" + dateTo + "/" + aggregationUnit.label;
+    }
+    public static String getMeterDataRawEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit){
+        return METER_DATA_RAW + dateFrom + "/" + dateTo + "/" + aggregationUnit.label;
     }
 
 }

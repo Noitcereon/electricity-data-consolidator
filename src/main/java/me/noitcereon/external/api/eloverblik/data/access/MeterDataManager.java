@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import me.noitcereon.MethodOutcome;
 import me.noitcereon.configuration.ConfigurationLoader;
 import me.noitcereon.configuration.SimpleConfigLoader;
+import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiAuthenticationHelper;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
-import me.noitcereon.external.api.eloverblik.models.MeterDataReadingsDto;
-import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
-import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
+import me.noitcereon.external.api.eloverblik.models.*;
 import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class is used to fetch MeterData from the ElOverblikApi, in one form or another.
+ */
 public class MeterDataManager {
     private final ConfigurationLoader configLoader;
     private static final Logger LOG = LoggerFactory.getLogger(MeterDataManager.class);
@@ -48,11 +50,44 @@ public class MeterDataManager {
         return Optional.empty();
     }
 
-    public Optional<List<MeterDataReadingsDto>> getMeterDataInPeriod(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregation) {
-        // TODO implement getMeterDataInPeriod
-        LOG.warn("Method not implemented.");
+    /**
+     * This fetches the raw API response for usage in app if needed.
+     * @param meteringPointsRequestBody
+     * @param dateFrom
+     * @param dateTo
+     * @param aggregationUnit
+     * @return Raw api response encapsualted in an Optional.
+     */
+    public Optional<MyEnergyDataMarketDocumentResponseListApiResponse> fetchEnergyDataMarketDocument(MeteringPointsRequest meteringPointsRequestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
+        try{
+            String endpoint = ElOverblikApiEndpoint.getMeterDataRawEndPoint(dateFrom, dateTo, aggregationUnit);
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBodyJson = objectMapper.writeValueAsString(meteringPointsRequestBody);
+            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
+            requestBuilder.header("Content-Type", "application/json");
+            HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+            LOG.info("Sending request to ElOverblikApi. Request: {}", request);
 
-        return Optional.empty();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if(response.statusCode() == 200 || response.statusCode() < 300){
+                LOG.info("Successful request to {}", request.uri());
+                LOG.info(response.body());
+                MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(response.body(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
+
+                return Optional.of(responseBody);
+            }
+            else{
+                throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + response.statusCode());
+            }
+        }
+        catch (InterruptedException intEx){
+            Thread.currentThread().interrupt();
+        }
+        catch (Exception e){
+            LOG.error("Exception occurred when sending request to ElOverblikApi", e);
+        }
+        return Optional.empty(); // Something went wrong.
     }
 
     public MethodOutcome getMeterDataInPeriodAsCsv(List<MeteringPointApiDto> meteringPointApiDtos, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
@@ -99,5 +134,35 @@ public class MeterDataManager {
             Thread.currentThread().interrupt();
         }
         return MethodOutcome.FAILURE;
+    }
+    public Optional<String> fetchMeterDataInPeriodAsCsvString(MeteringPointsRequest httpRequestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
+        try {
+            String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
+
+            // Build request
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String requestBodyJson = objectMapper.writeValueAsString(httpRequestBody);
+            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
+            requestBuilder.header("accept", "text/csv");
+            requestBuilder.header("Content-Type", "application/json");
+            HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+
+            LOG.info("Sending ElOverblikApi HTTP request to {} ", request.uri());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            LOG.info("Response from ElOverblikApi HTTP request to {} resulted in status code {}", request.uri(), response.statusCode());
+            if (response.statusCode() == 200) {
+                LOG.info("Success!");
+                return Optional.of(response.body());
+            }
+            LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
+            LOG.warn("Response to request: {}", response);
+        }
+        catch (IOException | InterruptedException e) {
+            LOG.error(e.getMessage());
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        }
+        return Optional.empty(); // Something went wrong when fetching data.
     }
 }

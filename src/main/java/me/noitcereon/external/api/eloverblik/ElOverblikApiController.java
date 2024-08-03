@@ -7,12 +7,18 @@ import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.data.access.DataAccessTokenManager;
 import me.noitcereon.external.api.eloverblik.data.access.MeterDataManager;
 import me.noitcereon.external.api.eloverblik.data.access.MeteringPointManager;
-import me.noitcereon.external.api.eloverblik.models.MeterDataReadingsDto;
+import me.noitcereon.external.api.eloverblik.models.MeterDataFormatted;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
+import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
+import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -75,8 +81,39 @@ public class ElOverblikApiController {
         throw new ElectricityConsolidatorRuntimeException("Something went wrong during call to getMeteringPoints. Args: includeAll=" + includeAll);
     }
 
-    public Optional<List<MeterDataReadingsDto>> getMeterDataInPeriod(LocalDate dateFrom, LocalDate dateTo, TimeAggregation timeAggregation) {
-        return meterDataManager.getMeterDataInPeriod(dateFrom, dateTo, timeAggregation);
+    /**
+     * Retrieves a csv file containing MeterData and then tries to format it to {@link MeterDataFormatted} and creates it as a csv file in dataFromApi.
+     * @param meteringPointsRequest Http request body containing which meteringPoints to fetch MeterData from.
+     * @param dateFrom Start date to fetch data from.
+     * @param dateTo End date to fetch data from.
+     * @param timeAggregation Most likely {@link TimeAggregation#HOUR} (at the time of writing nothing else has been used).
+     * @return {@link MethodOutcome#SUCCESS} if file is created with data or already exists with data. Otherwise, {@link MethodOutcome#FAILURE}
+     * @throws IOException On failure to create necessary files.
+     */
+    public MethodOutcome fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation timeAggregation) throws IOException {
+        // Prepare a file for response data.
+        Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
+        if(!fileDirectory.toFile().exists()){
+            Files.createDirectory(fileDirectory);
+        }
+        Path filePath = Path.of(fileDirectory.toString(), FileNameGenerator.meterDataCustomFormatCsvFile(dateFrom, dateTo));
+        if(filePath.toFile().exists() && filePath.toFile().length() != 0){
+            // We already have the data, so no need to fetch it a second time.
+            return MethodOutcome.SUCCESS;
+        }
+
+        Optional<String> originalCsvFromApi = meterDataManager.fetchMeterDataInPeriodAsCsvString(meteringPointsRequest, dateFrom, dateTo, timeAggregation);
+        if(originalCsvFromApi.isEmpty()) return MethodOutcome.FAILURE;
+        List<MeterDataFormatted> formattedMeterData = MeterDataFormatted.parseFrom(originalCsvFromApi.get());
+        Path csvFilePath = Files.createFile(filePath);
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toFile()))){
+            boolean shouldAddHeader = true;
+            for (MeterDataFormatted meterDataEntry : formattedMeterData) {
+                writer.write(meterDataEntry.asCsv(shouldAddHeader));
+                if(shouldAddHeader) shouldAddHeader = false;
+            }
+        }
+        return MethodOutcome.SUCCESS;
     }
 
     public MethodOutcome getMeterDataCsvFile(List<MeteringPointApiDto> meteringPoints, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {

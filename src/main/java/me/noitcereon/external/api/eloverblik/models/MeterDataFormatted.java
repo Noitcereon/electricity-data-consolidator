@@ -72,7 +72,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
      */
     public static List<MeterDataFormatted> parseFrom(String apiCsvFileContents){
 
-        String normalizedCsvInput = apiCsvFileContents.stripIndent();
+        String normalizedCsvInput = apiCsvFileContents.stripIndent().strip();
         if(!normalizedCsvInput.startsWith("Målepunkt")){
             throw new IllegalArgumentException("Can't parse normalized 'apiCsvFileContents': '" + normalizedCsvInput + "'");
         }

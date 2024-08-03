@@ -10,4 +10,7 @@ public class FileNameGenerator {
     public static String meterDataCsvFile(LocalDate dateFrom, LocalDate dateTo){
         return "meterdata" + dateFrom.format(DateTimeFormatter.ISO_DATE) + "-"+dateTo.format(DateTimeFormatter.ISO_DATE) + ".csv";
     }
+    public static String meterDataCustomFormatCsvFile(LocalDate dateFrom, LocalDate dateTo){
+        return "meterdata-custom-format" + dateFrom.format(DateTimeFormatter.ISO_DATE) + "-"+dateTo.format(DateTimeFormatter.ISO_DATE) + ".csv";
+    }
 }

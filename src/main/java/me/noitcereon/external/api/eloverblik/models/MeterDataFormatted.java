@@ -1,0 +1,142 @@
+package me.noitcereon.external.api.eloverblik.models;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+/**
+ * A model representing MeterData from ElOverblikApi in a customized format. Intended for writing meter-data into a specific format in e.g. a CSV file.
+ *
+ * @author Thomas B. Andersen
+ */
+public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateTime, LocalDateTime toDateTime,
+                                 String hourOfDay, String amount, String measurementUnit, String quality) {
+
+    /**
+     * For example: "29-01-2024"
+     */
+    private static final DateTimeFormatter DAY_MONTH_YEAR = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    /**
+     * For example: "2011-12-03T10:15:30Z"
+     */
+    private static final DateTimeFormatter YEAR_MONTH_DAY_T_HOUR_MINUTE_SECOND_Z = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault());
+
+    /**
+     * For example "01-05-2024 01:00:00"
+     */
+    private static final DateTimeFormatter DAY_MONTH_YEAR_HH_MM_SS = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private static final String NEW_LINE_REGEX = "\\n|\\r\\n|\\r";
+
+    public static List<MeterDataFormatted> from(TimeSeries timeSeries) {
+        // For every Period
+        // If Period has 24 entries/is of hourly data
+        // extract information from the period as FormattedMeterData
+        // Add it to formattedMeterData list
+        // Return formattedMeterData.
+        List<MeterDataFormatted> output = new ArrayList<>();
+        for (Period period : timeSeries.periods()) {
+            for (Point point : period.points()) {
+                String fromDateTimeStr = period.timeInterval().start(); // timeInterval.start
+                String toDateTimeStr = period.timeInterval().end(); // timeInterval.end
+                LocalDateTime fromDateTime = LocalDateTime.parse(fromDateTimeStr, YEAR_MONTH_DAY_T_HOUR_MINUTE_SECOND_Z);
+                LocalDateTime toDateTime = LocalDateTime.parse(toDateTimeStr, YEAR_MONTH_DAY_T_HOUR_MINUTE_SECOND_Z);
+
+                String amount = point.outQuantity(); // out_Quantity.quantity
+                String quality = point.outQuantityQuality(); // out_Quantity.quality
+                String hourOfDay = point.position();
+                MeterDataFormatted formattedMeterData = new MeterDataFormatted(timeSeries.mRid(), fromDateTime, toDateTime,
+                        hourOfDay, amount, timeSeries.measurementUnitName(), quality);
+                output.add(formattedMeterData);
+            }
+        }
+        return output;
+    }
+
+    public static List<MeterDataFormatted> from(List<TimeSeries> timeSeries) {
+        List<MeterDataFormatted> output = new ArrayList<>();
+        for (TimeSeries x : timeSeries) {
+            output.addAll(from(x));
+        }
+        return output;
+    }
+
+    /**
+     * <p>Tries to parse a string with CSV MeterData (with headers) into a list of MeterDataFormatted objects.</p>
+     * Example argument:<br>
+     * <pre>Målepunkt id;Fra dato;Til dato;Mængde;Måleenhed;Kvalitet;Type
+     * 571313174001764929;01-05-2024 00:00:00;01-05-2024 01:00:00;0,053;KWH;Målt;Tidsserie</pre>
+     * @param apiCsvFileContents MeterData CSV file contents as provided by ELOverblikApi v1.
+     * @return The given argument as a list of {@link MeterDataFormatted}.
+     */
+    public static List<MeterDataFormatted> parseFrom(String apiCsvFileContents){
+
+        String normalizedCsvInput = apiCsvFileContents.stripIndent();
+        if(!normalizedCsvInput.startsWith("Målepunkt")){
+            throw new IllegalArgumentException("Can't parse normalized 'apiCsvFileContents': '" + normalizedCsvInput + "'");
+        }
+
+        return Arrays.stream(apiCsvFileContents.split(NEW_LINE_REGEX))
+                .parallel() // To utilize multiple threads
+                .map(MeterDataFormatted::parseCsvLine)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    /**
+     * @param meterDataAsCsvLine Example parseable input: "571313174001764929;01-05-2024 13:00:00;01-05-2024 14:00:00;1,417;KWH;Målt;Tidsserie"
+     * @return A Optional with MeterDataFormatted object or an empty Optional if unable to parse the given argument.
+     */
+    private static Optional<MeterDataFormatted> parseCsvLine(String meterDataAsCsvLine) {
+        try {
+            if (meterDataAsCsvLine.startsWith("Målepunkt")) {
+                return Optional.empty(); // This is csv header and thus cannot be parsed.
+            }
+            String[] meterDataArray = meterDataAsCsvLine.split(";");
+            if(meterDataArray.length != 7) return Optional.empty();
+            String meteringPointId = meterDataArray[0];
+            LocalDateTime fromTime = LocalDateTime.parse(meterDataArray[1], DAY_MONTH_YEAR_HH_MM_SS); // Should match format: "01-05-2024 01:00:00"
+            LocalDateTime toTime = LocalDateTime.parse(meterDataArray[2], DAY_MONTH_YEAR_HH_MM_SS);
+            String hourOfDay = String.valueOf(fromTime.getHour());
+            String amount = meterDataArray[3];
+            String unitOfMeasurement = meterDataArray[4];
+            String dataQuality = meterDataArray[5];
+            return Optional.of(new MeterDataFormatted(meteringPointId, fromTime, toTime, hourOfDay, amount, unitOfMeasurement, dataQuality));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns the MeterDataFormatted as a csv String using ';' as delimited. Data goes in the following order:
+     * Målepunkt id;Fra dato;Fra tidspunkt;Til dato;Til tidspunkt;Mængde;Måleenhed;Kvalitet;Type
+     *
+     * @return A String in csv format using the provided delimiter.
+     */
+    public String asCsv(boolean withHeaders) {
+        String delimiter = ";";
+        StringBuilder sb = new StringBuilder(64); // Assuming that it'll be a string of at least 64 characters for slight performance gain.
+        if (withHeaders) {
+            sb.append("Målepunkt id").append(delimiter).append("Fra dato").append(delimiter).append("Fra tidspunkt")
+                    .append(delimiter).append("Til dato").append(delimiter).append("Til tidspunkt")
+                    .append(delimiter).append("Mængde").append(delimiter).append("Måleenhed")
+                    .append(delimiter).append("Kvalitet").append(delimiter).append("Type").append(delimiter)
+                    .append("TimeSlag")
+                    .append(System.lineSeparator());
+        }
+        sb.append(meteringPointId).append(delimiter);
+        sb.append(fromDateTime.toLocalDate().format(DAY_MONTH_YEAR)).append(delimiter);
+        sb.append(fromDateTime.toLocalTime()).append(delimiter);
+        sb.append(toDateTime.toLocalDate().format(DAY_MONTH_YEAR)).append(delimiter);
+        sb.append(toDateTime.toLocalTime()).append(delimiter);
+        sb.append(amount).append(delimiter);
+        sb.append(measurementUnit).append(delimiter);
+        sb.append(quality).append(delimiter);
+        sb.append("Tidsserie").append(delimiter);
+        sb.append(hourOfDay).append(System.lineSeparator());
+
+        return sb.toString();
+    }
+}

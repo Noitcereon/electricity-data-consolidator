@@ -54,7 +54,7 @@ public class ScreenOptionFactory {
     public ScreenOption fetchMeterData() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDate dayBeforeYesterDay = yesterday.minusDays(1);
-        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY).orElse(FALSE));
         return new ScreenOption("Fetch meterdata from yesterday (" + yesterday + ")", () -> {
             try{
                 Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
@@ -86,7 +86,7 @@ public class ScreenOptionFactory {
     public ScreenOption fetchMeterDataBasedOnLastFetchTime() {
         LocalDate latestFetchDate = LocalDate.now().minusDays(2);
         Optional<String> latestFetchDateFromConf = configLoader.getProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE);
-        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY).orElse(FALSE));
         if (latestFetchDateFromConf.isPresent()) {
             latestFetchDate = LocalDate.parse(latestFetchDateFromConf.get());
         }
@@ -115,7 +115,7 @@ public class ScreenOptionFactory {
     }
 
     public ScreenOption fetchMeterDataCustomPeriod() {
-        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY).orElse(FALSE));
         return new ScreenOption("Fetch meterdata from a period you define", () -> {
             try {
                 System.out.println("Enter dateFrom in format YYYY-MM-DD");

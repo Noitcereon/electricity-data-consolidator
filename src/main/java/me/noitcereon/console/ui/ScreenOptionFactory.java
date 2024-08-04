@@ -67,7 +67,7 @@ public class ScreenOptionFactory {
                         elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
                         : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
-                    return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday);
+                    return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday, useCustomMeterDataFormat);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
             }catch (IOException e){
@@ -76,8 +76,8 @@ public class ScreenOptionFactory {
         });
     }
 
-    protected Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate) {
-        String fileName = FileNameGenerator.meterDataCsvFile(fromDate, toDate);
+    protected Screen displayMeterDataSuccessResultScreen(LocalDate fromDate, LocalDate toDate, boolean useCustomFormat) {
+        String fileName = useCustomFormat ? FileNameGenerator.meterDataCustomFormatCsvFile(fromDate, toDate) : FileNameGenerator.meterDataCsvFile(fromDate, toDate);
         String dataDirectory = System.getProperty("user.dir") + File.separator + "dataFromApi" + File.separator;
         String fileLocation = dataDirectory + fileName;
         return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileLocation));
@@ -104,7 +104,7 @@ public class ScreenOptionFactory {
                         : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), fromDate, toDate, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
-                    return displayMeterDataSuccessResultScreen(fromDate, toDate);
+                    return displayMeterDataSuccessResultScreen(fromDate, toDate, useCustomMeterDataFormat);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
             }catch (IOException e){
@@ -130,7 +130,7 @@ public class ScreenOptionFactory {
                         elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dateFrom, dateTo, TimeAggregation.HOUR)
                         : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
-                    return displayMeterDataSuccessResultScreen(dateFrom, dateTo);
+                    return displayMeterDataSuccessResultScreen(dateFrom, dateTo, useCustomMeterDataFormat);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
             } catch (DateTimeParseException parseException) {

@@ -6,11 +6,13 @@ import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
+import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
 import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -24,39 +26,53 @@ public class ScreenOptionFactory {
     private final ConfigurationLoader configLoader;
     private final ConfigurationSaver configSaver;
     private final ElOverblikApiController elOverblikApi;
+    private static final String CUSTOM_METER_DATA_FORMAT_ENABLED_KEY = "custom-meter-data-format-enabled";
+    public static final String FALSE = "false";
 
-    public ScreenOptionFactory(){
-        configLoader =  SimpleConfigLoader.getInstance();
+    public ScreenOptionFactory() {
+        configLoader = SimpleConfigLoader.getInstance();
         configSaver = SimpleConfigSaver.getInstance();
         this.elOverblikApi = new ElOverblikApiController();
     }
-    public ScreenOptionFactory(ElOverblikApiController elOverblikApiController){
+
+    public ScreenOptionFactory(ElOverblikApiController elOverblikApiController) {
         configLoader = SimpleConfigLoader.getInstance();
         configSaver = SimpleConfigSaver.getInstance();
         this.elOverblikApi = elOverblikApiController;
     }
-    public ScreenOptionFactory(ConfigurationLoader configLoader, ConfigurationSaver configSaver, ElOverblikApiController elOverblikApiController){
+
+    public ScreenOptionFactory(ConfigurationLoader configLoader, ConfigurationSaver configSaver, ElOverblikApiController elOverblikApiController) {
         this.configLoader = configLoader;
         this.configSaver = configSaver;
         this.elOverblikApi = elOverblikApiController;
     }
+
     public ScreenOption mainMenuOption() {
         return new ScreenOption("Displays the main menu", () -> ScreenFactory.createMainMenu().displayScreenAndAskForInput().execute());
     }
-    public ScreenOption fetchMeterData(){
+
+    public ScreenOption fetchMeterData() {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         LocalDate dayBeforeYesterDay = yesterday.minusDays(1);
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
         return new ScreenOption("Fetch meterdata from yesterday (" + yesterday + ")", () -> {
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
-            if(meteringPoints.isEmpty()){
-                LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
-                throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+            try{
+                Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
+                if (meteringPoints.isEmpty()) {
+                    LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
+                    throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+                }
+
+                MethodOutcome outcome = useCustomMeterDataFormat ?
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
+                if (outcome.equals(MethodOutcome.SUCCESS)) {
+                    return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday);
+                }
+                return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
+            }catch (IOException e){
+                throw new ElectricityConsolidatorRuntimeException(e);
             }
-            MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
-            if(outcome.equals(MethodOutcome.SUCCESS)){
-                return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday);
-            }
-            return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });
     }
 
@@ -67,57 +83,87 @@ public class ScreenOptionFactory {
         return ScreenFactory.resultScreen("MeterData was saved to '%s'".formatted(fileLocation));
     }
 
-    public ScreenOption fetchMeterDataBasedOnLastFetchTime(){
+    public ScreenOption fetchMeterDataBasedOnLastFetchTime() {
         LocalDate latestFetchDate = LocalDate.now().minusDays(2);
-        Optional<String> latestFetchDateFromConf =  configLoader.getProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE);
-        if(latestFetchDateFromConf.isPresent()){
+        Optional<String> latestFetchDateFromConf = configLoader.getProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE);
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
+        if (latestFetchDateFromConf.isPresent()) {
             latestFetchDate = LocalDate.parse(latestFetchDateFromConf.get());
         }
         LocalDate fromDate = latestFetchDate;
         LocalDate toDate = LocalDate.now().minusDays(1);
         return new ScreenOption("Fetch MeterData based on latest fetch date (from %s to %s)".formatted(fromDate, toDate), () -> {
-            Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
-            if(meteringPoints.isEmpty()){
-                LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
-                throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+            try{
+                Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
+                if (meteringPoints.isEmpty()) {
+                    LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
+                    throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
+                }
+                MethodOutcome outcome = useCustomMeterDataFormat ?
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), fromDate, toDate, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), fromDate, toDate, TimeAggregation.HOUR);
+                if (outcome.equals(MethodOutcome.SUCCESS)) {
+                    System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
+                    return displayMeterDataSuccessResultScreen(fromDate, toDate);
+                }
+                return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
+            }catch (IOException e){
+                throw new ElectricityConsolidatorRuntimeException(e);
             }
-            MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), fromDate, toDate, TimeAggregation.HOUR);
-            if(outcome.equals(MethodOutcome.SUCCESS)){
-                System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
-                return displayMeterDataSuccessResultScreen(fromDate, toDate);
-            }
-            return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
         });
     }
-    public ScreenOption fetchMeterDataCustomPeriod(){
+
+    public ScreenOption fetchMeterDataCustomPeriod() {
+        boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, FALSE).get());
         return new ScreenOption("Fetch meterdata from a period you define", () -> {
-            try{
+            try {
                 System.out.println("Enter dateFrom in format YYYY-MM-DD");
                 LocalDate dateFrom = LocalDate.parse(Screen.getScannerInstance().nextLine());
                 System.out.println("Enter dateTo in format YYYY-MM-DD");
                 LocalDate dateTo = LocalDate.parse(Screen.getScannerInstance().nextLine());
                 Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
-                if(meteringPoints.isEmpty()){
+                if (meteringPoints.isEmpty()) {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                     throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
                 }
-                MethodOutcome outcome = elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
-                if(outcome.equals(MethodOutcome.SUCCESS)){
+                MethodOutcome outcome = useCustomMeterDataFormat ?
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dateFrom, dateTo, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
+                if (outcome.equals(MethodOutcome.SUCCESS)) {
                     return displayMeterDataSuccessResultScreen(dateFrom, dateTo);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
-            }catch (DateTimeParseException parseException){
-                System.err.println("Failed to parse input as date ("+ parseException.getMessage()+ ") . Going back to main menu.");
+            } catch (DateTimeParseException parseException) {
+                System.err.println("Failed to parse input as date (" + parseException.getMessage() + ") . Going back to main menu.");
                 return ScreenFactory.createMainMenu();
+            } catch (IOException e){
+                throw new ElectricityConsolidatorRuntimeException(e);
             }
         });
     }
 
-    public static ScreenOption exitApplication(){
+    public static ScreenOption exitApplication() {
         return new ScreenOption("Exits the application.", () -> {
             System.exit(0);
             return null; // this should never be reached.
         });
     }
 
+    public ScreenOption toggleMeterDataFormat() {
+
+        Optional<String> loadedConfigOption = configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY);
+        if (loadedConfigOption.isEmpty()) {
+            configSaver.saveProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, "true");
+            loadedConfigOption = Optional.of("true");
+        }
+        boolean isCustomFormatEnabled = Boolean.parseBoolean(loadedConfigOption.get());
+
+        return new ScreenOption("Toggle format of fetched meterdata (Currently: " + isCustomFormatEnabled + ")", () -> {
+            boolean newConfigValue = !isCustomFormatEnabled;
+            configSaver.saveProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, String.valueOf(newConfigValue));
+
+            String content = newConfigValue ? "Custom Meter Data Format is now enabled." : "Custom Meter Data Format is now disabled.";
+            return ScreenFactory.resultScreen(content);
+        });
+    }
 }

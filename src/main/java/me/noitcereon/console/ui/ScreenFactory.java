@@ -17,6 +17,7 @@ public class ScreenFactory {
         options.put(1, optionFactory.fetchMeterData());
         options.put(2, optionFactory.fetchMeterDataCustomPeriod());
         options.put(3, optionFactory.fetchMeterDataBasedOnLastFetchTime());
+        options.put(4, optionFactory.toggleMeterDataFormat());
 
         return new Screen("Electricity Data Consolidator App", options);
     }

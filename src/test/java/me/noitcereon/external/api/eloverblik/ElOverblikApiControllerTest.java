@@ -67,7 +67,7 @@ class ElOverblikApiControllerTest {
         TimeAggregation timeAggregation = TimeAggregation.HOUR;
         MeteringPointsRequest requestBody = MeteringPointsRequest.from(controller.getMeteringPoints(false).orElseThrow());
         // Act
-        MethodOutcome actual = controller.fetchMeterDataCsvAndChangeCsvFormat(requestBody, dateFrom, dateTo, timeAggregation);
+        MethodOutcome actual = controller.fetchMeterDataCsvCustomFormat(requestBody, dateFrom, dateTo, timeAggregation);
         // Assert
         Assertions.assertEquals(MethodOutcome.SUCCESS, actual);
     }
@@ -79,7 +79,7 @@ class ElOverblikApiControllerTest {
         MethodOutcome result = null;
         if(meteringPoints.isPresent()){
             MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
-            result = controller.getMeterDataCsvFile(meteringPointsToGetDataFrom, startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
+            result = controller.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
         }
         Assertions.assertNotNull(result);
         Assertions.assertEquals(MethodOutcome.SUCCESS, result);

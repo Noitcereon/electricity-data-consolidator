@@ -90,7 +90,7 @@ public class MeterDataManager {
         return Optional.empty(); // Something went wrong.
     }
 
-    public MethodOutcome getMeterDataInPeriodAsCsv(MeteringPointsRequest requestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
+    public MethodOutcome fetchMeterDataInPeriodAsCsvFile(MeteringPointsRequest requestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         try {
             String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
 

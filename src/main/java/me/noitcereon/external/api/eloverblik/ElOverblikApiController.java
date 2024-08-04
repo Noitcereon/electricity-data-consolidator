@@ -90,7 +90,7 @@ public class ElOverblikApiController {
      * @return {@link MethodOutcome#SUCCESS} if file is created with data or already exists with data. Otherwise, {@link MethodOutcome#FAILURE}
      * @throws IOException On failure to create necessary files.
      */
-    public MethodOutcome fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation timeAggregation) throws IOException {
+    public MethodOutcome fetchMeterDataCsvCustomFormat(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation timeAggregation) throws IOException {
         // Prepare a file for response data.
         Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
         if(!fileDirectory.toFile().exists()){
@@ -116,8 +116,8 @@ public class ElOverblikApiController {
         return MethodOutcome.SUCCESS;
     }
 
-    public MethodOutcome getMeterDataCsvFile(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
-        MethodOutcome result = meterDataManager.getMeterDataInPeriodAsCsv(meteringPointsRequest, dateFrom, dateTo, aggregationUnit);
+    public MethodOutcome fetchMeterDataCsvFile(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
+        MethodOutcome result = meterDataManager.fetchMeterDataInPeriodAsCsvFile(meteringPointsRequest, dateFrom, dateTo, aggregationUnit);
         if(result == MethodOutcome.SUCCESS){
             LOG.info("""
                     MeterData from the following MeteringPoints: {}

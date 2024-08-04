@@ -64,8 +64,8 @@ public class ScreenOptionFactory {
                 }
                 MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvCustomFormat(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
+                        : elOverblikApi.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday, useCustomMeterDataFormat);
                 }
@@ -101,8 +101,8 @@ public class ScreenOptionFactory {
                 }
                 MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvCustomFormat(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR)
+                        : elOverblikApi.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
                     return displayMeterDataSuccessResultScreen(fromDate, toDate, useCustomMeterDataFormat);
@@ -129,8 +129,8 @@ public class ScreenOptionFactory {
                 }
                 MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvCustomFormat(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR)
+                        : elOverblikApi.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     return displayMeterDataSuccessResultScreen(dateFrom, dateTo, useCustomMeterDataFormat);
                 }

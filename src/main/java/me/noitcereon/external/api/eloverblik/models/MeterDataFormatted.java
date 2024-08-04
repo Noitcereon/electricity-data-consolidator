@@ -73,7 +73,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
     public static List<MeterDataFormatted> parseFrom(String apiCsvFileContents){
 
         String normalizedCsvInput = apiCsvFileContents.stripIndent().strip();
-        if(!normalizedCsvInput.startsWith("Målepunkt")){
+        if(!normalizedCsvInput.startsWith("M")){
             throw new IllegalArgumentException("Can't parse normalized 'apiCsvFileContents': '" + normalizedCsvInput + "'");
         }
 
@@ -91,7 +91,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
      */
     private static Optional<MeterDataFormatted> parseCsvLine(String meterDataAsCsvLine) {
         try {
-            if (meterDataAsCsvLine.startsWith("Målepunkt")) {
+            if (meterDataAsCsvLine.startsWith("M")) {
                 return Optional.empty(); // This is csv header and thus cannot be parsed.
             }
             String[] meterDataArray = meterDataAsCsvLine.split(";");

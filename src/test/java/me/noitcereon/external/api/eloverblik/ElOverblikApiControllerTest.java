@@ -78,7 +78,8 @@ class ElOverblikApiControllerTest {
         Optional<List<MeteringPointApiDto>> meteringPoints = controller.getMeteringPoints(false);
         MethodOutcome result = null;
         if(meteringPoints.isPresent()){
-            result = controller.getMeterDataCsvFile(meteringPoints.orElseThrow(), startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
+            MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
+            result = controller.getMeterDataCsvFile(meteringPointsToGetDataFrom, startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
         }
         Assertions.assertNotNull(result);
         Assertions.assertEquals(MethodOutcome.SUCCESS, result);

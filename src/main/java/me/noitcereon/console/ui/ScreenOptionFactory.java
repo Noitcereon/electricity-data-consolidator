@@ -62,10 +62,10 @@ public class ScreenOptionFactory {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                     throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
                 }
-
+                MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, dayBeforeYesterDay, yesterday, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday, useCustomMeterDataFormat);
                 }
@@ -99,9 +99,10 @@ public class ScreenOptionFactory {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                     throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
                 }
+                MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), fromDate, toDate, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), fromDate, toDate, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, fromDate, toDate, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     System.out.println(configSaver.saveProperty(ConfigurationKeys.LATEST_METER_DATA_FETCH_DATE, toDate.toString()));
                     return displayMeterDataSuccessResultScreen(fromDate, toDate, useCustomMeterDataFormat);
@@ -126,9 +127,10 @@ public class ScreenOptionFactory {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
                     throw new ElectricityConsolidatorRuntimeException("No metering points, so can't continue.");
                 }
+                MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
                 MethodOutcome outcome = useCustomMeterDataFormat ?
-                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(MeteringPointsRequest.from(meteringPoints.get()), dateFrom, dateTo, TimeAggregation.HOUR)
-                        : elOverblikApi.getMeterDataCsvFile(meteringPoints.get(), dateFrom, dateTo, TimeAggregation.HOUR);
+                        elOverblikApi.fetchMeterDataCsvAndChangeCsvFormat(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR)
+                        : elOverblikApi.getMeterDataCsvFile(meteringPointsToGetDataFrom, dateFrom, dateTo, TimeAggregation.HOUR);
                 if (outcome.equals(MethodOutcome.SUCCESS)) {
                     return displayMeterDataSuccessResultScreen(dateFrom, dateTo, useCustomMeterDataFormat);
                 }

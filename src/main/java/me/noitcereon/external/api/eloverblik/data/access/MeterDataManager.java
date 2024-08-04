@@ -90,14 +90,13 @@ public class MeterDataManager {
         return Optional.empty(); // Something went wrong.
     }
 
-    public MethodOutcome getMeterDataInPeriodAsCsv(List<MeteringPointApiDto> meteringPointApiDtos, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
+    public MethodOutcome getMeterDataInPeriodAsCsv(MeteringPointsRequest requestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         try {
             String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
 
             // Build request
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
             ObjectMapper objectMapper = new ObjectMapper();
-            MeteringPointsRequest requestBody = MeteringPointsRequest.from(meteringPointApiDtos);
             String requestBodyJson = objectMapper.writeValueAsString(requestBody);
             requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
             requestBuilder.header("accept", "text/csv");

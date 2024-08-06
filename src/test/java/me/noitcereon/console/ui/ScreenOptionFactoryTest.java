@@ -48,7 +48,7 @@ class ScreenOptionFactoryTest {
         LocalDate fetchDataToDate = LocalDate.now().minusDays(1);
         Mockito.when(mockElOverblikApi.getMeteringPoints(Mockito.anyBoolean()))
                 .thenReturn(Optional.of(new ArrayList<>()));
-        Mockito.when(mockElOverblikApi.getMeterDataCsvFile(Mockito.any(), eq(fetchDataFromDate), eq(fetchDataToDate), eq(TimeAggregation.HOUR)))
+        Mockito.when(mockElOverblikApi.fetchMeterDataCsvFile(Mockito.any(), eq(fetchDataFromDate), eq(fetchDataToDate), eq(TimeAggregation.HOUR)))
                 .thenReturn(MethodOutcome.SUCCESS);
 
         String dataDirectory = System.getProperty("user.dir") + File.separator + "dataFromApi" + File.separator;

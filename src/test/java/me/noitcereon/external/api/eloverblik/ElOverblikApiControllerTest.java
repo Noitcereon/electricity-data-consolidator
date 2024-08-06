@@ -4,12 +4,13 @@ import me.noitcereon.CustomJunitTag;
 import me.noitcereon.MethodOutcome;
 import me.noitcereon.configuration.SimpleConfigLoader;
 import me.noitcereon.configuration.SimpleConfigSaver;
-import me.noitcereon.external.api.eloverblik.models.MeterDataReadingsDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
+import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
@@ -59,32 +60,16 @@ class ElOverblikApiControllerTest {
         Assertions.assertNotEquals(unexpectedMeteringPointId, meteringPointId);
     }
     @Test
-    @Disabled("Because it is not implemented yet.")
-    void givenDataAccessToken_WhenRetrievingMeterData_ThenResponseWithDataIsReturned(){
+    void givenDataAccessToken_WhenRetrievingFormattedMeterData_ThenOutcomeIsSuccessful() throws IOException {
         // Arrange
         LocalDate dateFrom = LocalDate.of(2024, Month.FEBRUARY, 18);
         LocalDate dateTo = LocalDate.of(2024, Month.FEBRUARY, 19);
         TimeAggregation timeAggregation = TimeAggregation.HOUR;
+        MeteringPointsRequest requestBody = MeteringPointsRequest.from(controller.getMeteringPoints(false).orElseThrow());
         // Act
-        Optional<List<MeterDataReadingsDto>> meterDataOptional = controller.getMeterDataInPeriod(dateFrom, dateTo, timeAggregation);
+        MethodOutcome actual = controller.fetchMeterDataCsvCustomFormat(requestBody, dateFrom, dateTo, timeAggregation);
         // Assert
-        List<MeterDataReadingsDto> meterData = meterDataOptional.orElseThrow();
-        if(meterData.isEmpty()) Assertions.fail("No meterData for some reason.");
-        // maybe more assertions?
-    }
-    @Test
-    @Disabled("Because it is not implemented yet.")
-    void givenDataAccessToken_WhenRetrievingMeterData_ThenResponseWithDataIsReturnedAsCsv(){
-        // Arrange
-        LocalDate dateFrom = LocalDate.of(2024, Month.FEBRUARY, 18);
-        LocalDate dateTo = LocalDate.of(2024, Month.FEBRUARY, 19);
-        TimeAggregation timeAggregation = TimeAggregation.HOUR;
-        // Act
-        Optional<List<MeterDataReadingsDto>> meterDataOptional = controller.getMeterDataInPeriod(dateFrom, dateTo, timeAggregation);
-        // Assert
-        List<MeterDataReadingsDto> meterData = meterDataOptional.orElseThrow();
-        if(meterData.isEmpty()) Assertions.fail("No meterData for some reason.");
-        // maybe more assertions?
+        Assertions.assertEquals(MethodOutcome.SUCCESS, actual);
     }
     @Test
     void givenDataAccessTokenAndMeteringPointsAndFromToDate_WhenFetchingHourlyMeterDataAsFile_ThenSuccessIsReturned(){
@@ -93,7 +78,8 @@ class ElOverblikApiControllerTest {
         Optional<List<MeteringPointApiDto>> meteringPoints = controller.getMeteringPoints(false);
         MethodOutcome result = null;
         if(meteringPoints.isPresent()){
-            result = controller.getMeterDataCsvFile(meteringPoints.orElseThrow(), startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
+            MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
+            result = controller.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
         }
         Assertions.assertNotNull(result);
         Assertions.assertEquals(MethodOutcome.SUCCESS, result);

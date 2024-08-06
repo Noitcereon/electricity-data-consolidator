@@ -9,6 +9,7 @@ simpleConfigSaverTest.conf
 simple-config-saver-key.conf
 last-data-access-refresh.conf
 latest-meter-data-fetch-date.conf
+custom-meter-data-format-enabled.conf
 
 # Data files (might contain sensitive data)
 /dataFromApi/*.csv

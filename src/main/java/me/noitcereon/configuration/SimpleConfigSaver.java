@@ -25,6 +25,7 @@ public class SimpleConfigSaver implements ConfigurationSaver{
             String lineToSave = key + "=" + value;
             outputWriter.write(lineToSave);
             outputWriter.flush();
+            SimpleConfigLoader.getInstance().forceRefreshCache();
         } catch (IOException e) {
             throw new ElectricityConsolidatorRuntimeException(e);
         }

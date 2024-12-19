@@ -6,7 +6,7 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.2.0-alpha</version> <!-- Semantic Versioning -->
+    <version>0.2.1-alpha</version> <!-- Semantic Versioning -->
     <!-- Public API: Anything that can be directly interacted with as a user. Below are a few examples:
       1. Console-UI
       2. Configuration files

@@ -13,6 +13,7 @@ import java.util.*;
 public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateTime, LocalDateTime toDateTime,
                                  String hourOfDay, String amount, String measurementUnit, String quality) {
 
+    public static final String HEADERS = "Målepunkt id;Fra dato;Fra tidspunkt;Til dato;Til tidspunkt;Mængde;Måleenhed;Kvalitet;Type;TimeSlag";
     /**
      * For example: "29-01-2024"
      */

@@ -5,8 +5,7 @@ import me.noitcereon.configuration.*;
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiController;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
-import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
-import me.noitcereon.external.api.eloverblik.models.MeteringPointsRequest;
+import me.noitcereon.external.api.eloverblik.models.*;
 import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +55,7 @@ public class ScreenOptionFactory {
         LocalDate dayBeforeYesterDay = yesterday.minusDays(1);
         boolean useCustomMeterDataFormat = Boolean.parseBoolean(configLoader.getProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY).orElse(FALSE));
         return new ScreenOption("Fetch meterdata from yesterday (" + yesterday + ")", () -> {
-            try{
+            try {
                 Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
                 if (meteringPoints.isEmpty()) {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
@@ -70,7 +69,7 @@ public class ScreenOptionFactory {
                     return displayMeterDataSuccessResultScreen(dayBeforeYesterDay, yesterday, useCustomMeterDataFormat);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
-            }catch (IOException e){
+            } catch (IOException e) {
                 throw new ElectricityConsolidatorRuntimeException(e);
             }
         });
@@ -93,7 +92,7 @@ public class ScreenOptionFactory {
         LocalDate fromDate = latestFetchDate;
         LocalDate toDate = LocalDate.now().minusDays(1);
         return new ScreenOption("Fetch MeterData based on latest fetch date (from %s to %s)".formatted(fromDate, toDate), () -> {
-            try{
+            try {
                 Optional<List<MeteringPointApiDto>> meteringPoints = elOverblikApi.getMeteringPoints(true);
                 if (meteringPoints.isEmpty()) {
                     LOG.error("Failed to retrieve meteringsPoints from API, so can't fetch MeterData.");
@@ -108,7 +107,7 @@ public class ScreenOptionFactory {
                     return displayMeterDataSuccessResultScreen(fromDate, toDate, useCustomMeterDataFormat);
                 }
                 return ScreenFactory.resultScreen("Something went wrong when trying to fetch MeterData.");
-            }catch (IOException e){
+            } catch (IOException e) {
                 throw new ElectricityConsolidatorRuntimeException(e);
             }
         });
@@ -138,7 +137,7 @@ public class ScreenOptionFactory {
             } catch (DateTimeParseException parseException) {
                 System.err.println("Failed to parse input as date (" + parseException.getMessage() + ") . Going back to main menu.");
                 return ScreenFactory.createMainMenu();
-            } catch (IOException e){
+            } catch (IOException e) {
                 throw new ElectricityConsolidatorRuntimeException(e);
             }
         });
@@ -160,11 +159,13 @@ public class ScreenOptionFactory {
         }
         boolean isCustomFormatEnabled = Boolean.parseBoolean(loadedConfigOption.get());
 
-        return new ScreenOption("Toggle format of fetched meterdata (Currently: " + isCustomFormatEnabled + ")", () -> {
+        return new ScreenOption("Toggle CSV file data format for meter data (Currently: " + (isCustomFormatEnabled ? "Custom format" : "Same as from ElOverblik website") + ")", () -> {
             boolean newConfigValue = !isCustomFormatEnabled;
             configSaver.saveProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, String.valueOf(newConfigValue));
 
-            String content = newConfigValue ? "Custom Meter Data Format is now enabled." : "Custom Meter Data Format is now disabled.";
+            String content = newConfigValue ?
+                    "Custom Meter Data Format is now enabled. This means meter data in the CSV files retrieved will now be in the format: " + MeterDataFormatted.HEADERS :
+                    "Custom Meter Data Format is now disabled, This means meter data in the CSV files retrieved will now be in the format: " + MeterDataDefaultFormat.HEADERS;
             return ScreenFactory.resultScreen(content);
         });
     }

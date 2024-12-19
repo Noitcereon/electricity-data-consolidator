@@ -28,6 +28,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
      */
     private static final DateTimeFormatter DAY_MONTH_YEAR_HH_MM_SS = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static final String NEW_LINE_REGEX = "\\n|\\r\\n|\\r";
+    private static final String MAALEPUNKT_ID = "Målepunkt id"; // Refactored into instance variable, because it's used in multiple places.
 
     public static List<MeterDataFormatted> from(TimeSeries timeSeries) {
         // For every Period
@@ -73,7 +74,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
     public static List<MeterDataFormatted> parseFrom(String apiCsvFileContents){
 
         String normalizedCsvInput = apiCsvFileContents.stripIndent().strip();
-        if(!normalizedCsvInput.startsWith("M")){
+        if(!normalizedCsvInput.contains(MAALEPUNKT_ID)){
             throw new IllegalArgumentException("Can't parse normalized 'apiCsvFileContents': '" + normalizedCsvInput + "'");
         }
 
@@ -87,11 +88,11 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
 
     /**
      * @param meterDataAsCsvLine Example parseable input: "571313174001764929;01-05-2024 13:00:00;01-05-2024 14:00:00;1,417;KWH;Målt;Tidsserie"
-     * @return A Optional with MeterDataFormatted object or an empty Optional if unable to parse the given argument.
+     * @return An Optional with MeterDataFormatted object or an empty Optional if unable to parse the given argument.
      */
     private static Optional<MeterDataFormatted> parseCsvLine(String meterDataAsCsvLine) {
         try {
-            if (meterDataAsCsvLine.startsWith("M")) {
+            if (meterDataAsCsvLine.contains(MAALEPUNKT_ID)) {
                 return Optional.empty(); // This is csv header and thus cannot be parsed.
             }
             String[] meterDataArray = meterDataAsCsvLine.split(";");
@@ -119,7 +120,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
         String delimiter = ";";
         StringBuilder sb = new StringBuilder(64); // Assuming that it'll be a string of at least 64 characters for slight performance gain.
         if (withHeaders) {
-            sb.append("Målepunkt id").append(delimiter).append("Fra dato").append(delimiter).append("Fra tidspunkt")
+            sb.append(MAALEPUNKT_ID).append(delimiter).append("Fra dato").append(delimiter).append("Fra tidspunkt")
                     .append(delimiter).append("Til dato").append(delimiter).append("Til tidspunkt")
                     .append(delimiter).append("Mængde").append(delimiter).append("Måleenhed")
                     .append(delimiter).append("Kvalitet").append(delimiter).append("Type").append(delimiter)

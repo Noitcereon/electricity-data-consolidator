@@ -32,6 +32,7 @@ This section is split in three:
 5. Now you can go to [Usage](#usage) to find out how to use the app.
 
 ### Making a Distribution File
+
 > Prerequisite: Maven v3.9.2 or later and a Java 17 JDK
 
 The distribution file is made via the [maven-assembly-plugin](https://maven.apache.org/plugins/maven-assembly-plugin/assembly.html) and a 
@@ -50,12 +51,12 @@ The one we're interested in is called `electricity-data-consolidator-{version}-d
 
 ### Making a Windows Installer with jpackage
 
-**Prerequisite**: [Wix v3.x CLI tool](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm).
+> **Prerequisite**: [Wix v3.x CLI tool](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm).
 
 [jpackage](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html) is a CLI tool for creating installers.
 
 To use the tool you must:
-1. Build the application
+1. Build the application (`mvn clean package -DisMavenSurefireTesting=true`)
 2. Navigate to target directory (where the executable jar with dependencies is located)
 3. Run the below CLI command (this gives jpackage the arguments needed to make a Windows installer)
    ```
@@ -64,6 +65,7 @@ To use the tool you must:
 4. An .exe installer file should be created, which can be distributed.
 
 ## Usage
+
 > Prerequisites: Java 17 or later.
 
 Simply open the application via `start.cmd` (if using Windows) or `start.sh` (on Linux/Mac) and you should

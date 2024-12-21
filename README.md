@@ -12,8 +12,10 @@ This project is still in its infancy and thus only has very limited functionalit
 - Automatically fetch new data access tokens (provided an eloverblik api key)
 - Fetch MeterData (electricity usage and generation) from the El Overblik API as .csv file from yesterday
 - Fetch MeterData from the El Overblik API as .csv file in custom period.
+- Fetch MeterData in a customized format (DateTime is split into separate Date + Time columns and a new column is added representing the hour of the day (value from 0 to 23)
 
 ## Install
+
 This section is split in three: 
 1. How to install the application from a distribution .zip file (`electricity-data-consolidator-x-distribution.zip`)
 2. Making a distribution file from source code

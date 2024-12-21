@@ -6,6 +6,8 @@ import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.exceptions.MissingApiKeyException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.models.StringApiResponse;
+import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
+import me.noitcereon.external.api.orchestration.ApiCallResult;
 import me.noitcereon.utilities.DateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
@@ -43,7 +44,6 @@ public class DataAccessTokenManager {
         }
         try {
             URI getDataAccessTokenEndPoint = new URI(ElOverblikApiEndpoint.DATA_ACCESS_TOKEN);
-            HttpClient httpClient = HttpClient.newHttpClient();
 
             String apiKey = configLoader.getApiKey();
             if (apiKey.isEmpty()) {
@@ -54,9 +54,9 @@ public class DataAccessTokenManager {
                             .header("Authorization", "Bearer " + configLoader.getApiKey())
                             .build();
 
-            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                switch (response.statusCode()) {
+            ApiCallResult<String> response = ApiCallOrchestrator.executeApiCall(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if (!response.isSuccess()) {
+                switch (response.httpStatusCode()) {
                     case 429:
                         System.out.println("El Overblik API denies further request for data due to too users requesting data. Please try again later.");
                         break;
@@ -70,7 +70,7 @@ public class DataAccessTokenManager {
                 }
             }
             ObjectMapper mapper = new ObjectMapper();
-            StringApiResponse responseObject = mapper.readValue(response.body(), StringApiResponse.class);
+            StringApiResponse responseObject = mapper.readValue(response.responseBody().orElseThrow(), StringApiResponse.class);
             configSaver.saveProperty(ConfigurationKeys.DATA_ACCESS_TOKEN, responseObject.getResult());
             configSaver.saveProperty(ConfigurationKeys.LAST_DATA_ACCESS_REFRESH, LocalDate.now().format(DateConverter.DEFAULT_DATE_FORMAT));
             return responseObject.getResult();

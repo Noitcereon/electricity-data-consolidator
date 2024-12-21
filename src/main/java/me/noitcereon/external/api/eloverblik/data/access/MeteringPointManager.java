@@ -6,19 +6,17 @@ import me.noitcereon.external.api.eloverblik.ElOverblikApiAuthenticationHelper;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDtoListApiResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
+import me.noitcereon.external.api.orchestration.ApiCallResult;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 
 public class MeteringPointManager {
-    private static final Logger LOG = LoggerFactory.getLogger(MeteringPointManager.class);
 
     public MeteringPointManager() {
         // Explicit MeteringPointManager.
@@ -33,23 +31,19 @@ public class MeteringPointManager {
      * @return Returns a list of metering points.
      */
     public Optional<List<MeteringPointApiDto>> getMeteringPoints(boolean includeAll) throws IOException, InterruptedException {
-        HttpClient httpClient = HttpClient.newHttpClient();
-
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+               HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(ElOverblikApiEndpoint.METERING_POINTS + "?includeAll=" + includeAll))
                 .GET();
         HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        ApiCallResult<String> response = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            LOG.warn("Request that failed: {}", request);
-            LOG.warn("Response to request: {}", response);
+        if (!response.isSuccess()) {
             return Optional.empty();
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        MeteringPointApiDtoListApiResponse responseBody = mapper.readValue(response.body(), MeteringPointApiDtoListApiResponse.class);
+        MeteringPointApiDtoListApiResponse responseBody = mapper.readValue(response.responseBody().orElseThrow(), MeteringPointApiDtoListApiResponse.class);
 
         return Optional.of(responseBody.getResult());
     }

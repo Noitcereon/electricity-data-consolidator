@@ -30,7 +30,7 @@ public class SimpleConfigSaver implements ConfigurationSaver{
             throw new ElectricityConsolidatorRuntimeException(e);
         }
 
-        return "Updated " + key + "to the value " + value;
+        return "Updated " + key + " to the value " + value;
     }
 
     private void ensureFileExists(Path configFile) {

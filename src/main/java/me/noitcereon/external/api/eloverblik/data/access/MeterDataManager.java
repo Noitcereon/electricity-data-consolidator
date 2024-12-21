@@ -67,18 +67,17 @@ public class MeterDataManager {
             requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
             requestBuilder.header("Content-Type", "application/json");
             HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
-            LOG.info("Sending request to ElOverblikApi. Request: {}", request);
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if(response.statusCode() == 200 || response.statusCode() < 300){
+            ApiCallOrchestrator.ApiCallResult<String> apiCallResult = ApiCallOrchestrator.executeApiCallAndLogIt(request, HttpResponse.BodyHandlers.ofString());
+
+            if(apiCallResult.isSuccess() && apiCallResult.responseBody().isPresent()){
                 LOG.info("Successful request to {}", request.uri());
-                LOG.info(response.body());
-                MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(response.body(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
+                MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(apiCallResult.responseBody().get(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
 
                 return Optional.of(responseBody);
             }
             else{
-                throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + response.statusCode());
+                throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + apiCallResult.httpStatusCode());
             }
         }
         catch (InterruptedException intEx){

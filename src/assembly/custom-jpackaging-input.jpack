@@ -7,3 +7,4 @@
 --main-jar electricity-data-consolidator-${project.version}-jar-with-dependencies.jar
 --vendor "Noitcereon"
 --verbose
+--java-options -Dtinylog.configuration=./app/tinylog.properties

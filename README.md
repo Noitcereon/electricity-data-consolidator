@@ -59,12 +59,13 @@ The one we're interested in is called `electricity-data-consolidator-{version}-d
 
 To use the tool you must:
 1. Build the application (`mvn clean package -DisMavenSurefireTesting=true`)
-2. Navigate to target directory (where the executable jar with dependencies is located)
-3. Run the below CLI command (this gives jpackage the arguments needed to make a Windows installer)
+2. Run the `prepare-installer.sh` script (for copying any needed files to target directory)
+3. Navigate to target directory (where the executable jar with dependencies is located)
+4. Run the below CLI command (this gives jpackage the arguments needed to make a Windows installer)
    ```
    jpackage @custom-jpackaging-input.jpack --verbose
    ```
-4. An .exe installer file should be created, which can be distributed.
+5. An .exe installer file should be created, which can be distributed.
 
 ## Usage
 

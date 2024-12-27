@@ -43,6 +43,12 @@
             <fileMode>771</fileMode>
         </file>
         <file>
+            <source>${project.basedir}/src/main/resources/tinylog.properties</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>false</filtered>
+            <fileMode>661</fileMode>
+        </file>
+        <file>
             <source>${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>
             <outputDirectory>/</outputDirectory>
         </file>

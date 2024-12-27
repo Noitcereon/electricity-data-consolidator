@@ -55,9 +55,18 @@ public class DataAccessTokenManager {
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                ElectricityConsolidatorRuntimeException e = new ElectricityConsolidatorRuntimeException("Could not retrieve data access token.");
-                String message = e.getMessage() + "Response from eloverblik API is: " + response;
-                LOG.error(message, e);
+                switch(response.statusCode()){
+                    case 429:
+                        System.out.println("El Overblik API denies further request for data due to too users requesting data. Please try again later.");
+                        break;
+                    case 509:
+                        System.out.println("El Overblik API cannot keep up with demand and is unavailable at this time ('DataHub unavailable'). Please try again later.");
+                        break;
+                    default:
+                        ElectricityConsolidatorRuntimeException e = new ElectricityConsolidatorRuntimeException("Could not retrieve data access token.");
+                        String message = e.getMessage() + "Response from eloverblik API is: " + response;
+                        LOG.error(message, e);
+                }
             }
             ObjectMapper mapper = new ObjectMapper();
             StringApiResponse responseObject = mapper.readValue(response.body(), StringApiResponse.class);

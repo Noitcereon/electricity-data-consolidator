@@ -6,7 +6,7 @@
 
     <groupId>me.noitcereon</groupId>
     <artifactId>electricity-data-consolidator</artifactId>
-    <version>0.2.1-alpha</version> <!-- Semantic Versioning -->
+    <version>0.3.0-alpha</version> <!-- Semantic Versioning -->
     <!-- Public API: Anything that can be directly interacted with as a user. Below are a few examples:
       1. Console-UI
       2. Configuration files
@@ -22,7 +22,7 @@
         <!-- version-for-jpackage is used in /src/assembly/custom-jpackaging-input.jpack (it requires MAJOR.MINOR.BUILD, but since I don't have a BUILD I just use PATCH version) -->
         <!-- NOTE: I've experienced an issue when using an installer with same version as a previously installed version of the app. Increment PATCH version solved the issue for some reason. -->
         <!-- jpackage docs: https://docs.oracle.com/en/java/javase/17/docs/specs/man/jpackage.html -->
-        <version.for.jpackage>0.2.1</version.for.jpackage>
+        <version.for.jpackage>0.3.0</version.for.jpackage>
         <tinylog.version>2.7.0</tinylog.version>
     </properties>
     <dependencies>

@@ -17,23 +17,22 @@ class MeterDataFormattedTest {
         String meteringPointId = "571313174001764929";
         LocalDateTime fromDateTime = LocalDateTime.of(2024, Month.MAY, 9, 16, 0);
         LocalDateTime toDateTime = LocalDateTime.of(2024, Month.MAY, 9, 17, 0);
-        String hourOfDay = "1";
+        String hourOfDay = "16";
         String amount = "0,752";
         String measurementUnit = "KWH";
         String quality = "Målt";
 
         MeterDataFormatted meterData = new MeterDataFormatted(meteringPointId, fromDateTime, toDateTime, hourOfDay, amount, measurementUnit, quality);
-        String expectedFormat = "Målepunkt id;Fra dato;Fra tidspunkt;Til dato;Til tidspunkt;Mængde;Måleenhed;Kvalitet;Type;TimeSlag" + System.lineSeparator()
-                + "571313174001764929;09-05-2024;16:00;09-05-2024;17:00;0,752;KWH;Målt;Tidsserie;1" + System.lineSeparator();
+        String expectedFormat = "Målepunkt id;Fra dato;Til dato;Mængde;Måleenhed;Kvalitet;Type;TimeSlag" + System.lineSeparator()
+                + "571313174001764929;09-05-2024;09-05-2024;0,752;KWH;Målt;Tidsserie;16" + System.lineSeparator();
 
-        // 571313174001764929;09-05-2024 16:00:00;09-05-2024 17:00:00;0,752;KWH;Målt;Tidsserie
         String actualFormat = meterData.asCsv( true);
 
         Assertions.assertEquals(expectedFormat, actualFormat);
     }
 
     @Test
-    void givenMeterData_WhenConvertingObjectToCsvString_ThenFormatIsAsExpected() {
+    void givenMeterData_WhenConvertingObjectToCsvStringWithoutHeaders_ThenFormatIsAsExpected() {
         String meteringPointId = "571313174001764929";
         LocalDateTime fromDateTime = LocalDateTime.of(2024, Month.MAY, 9, 16, 0);
         LocalDateTime toDateTime = LocalDateTime.of(2024, Month.MAY, 9, 17, 0);
@@ -43,7 +42,7 @@ class MeterDataFormattedTest {
         String quality = "Målt";
 
         MeterDataFormatted meterData = new MeterDataFormatted(meteringPointId, fromDateTime, toDateTime, hourOfDay, amount, measurementUnit, quality);
-        String expectedFormat = "571313174001764929;09-05-2024;16:00;09-05-2024;17:00;0,752;KWH;Målt;Tidsserie;1" + System.lineSeparator();
+        String expectedFormat = "571313174001764929;09-05-2024;09-05-2024;0,752;KWH;Målt;Tidsserie;01" + System.lineSeparator();
 
         String actualFormat = meterData.asCsv(false);
 

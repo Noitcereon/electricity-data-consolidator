@@ -164,8 +164,8 @@ public class ScreenOptionFactory {
             configSaver.saveProperty(CUSTOM_METER_DATA_FORMAT_ENABLED_KEY, String.valueOf(newConfigValue));
 
             String content = newConfigValue ?
-                    "Custom Meter Data Format is now enabled. This means meter data in the CSV files retrieved will now be in the format: " + MeterDataFormatted.HEADERS :
-                    "Custom Meter Data Format is now disabled, This means meter data in the CSV files retrieved will now be in the format: " + MeterDataDefaultFormat.HEADERS;
+                    "Custom Meter Data Format is now enabled. This means meter data in the CSV files retrieved will now be in the format: " + MeterDataFormatted.CUSTOM_HEADERS :
+                    "Custom Meter Data Format is now disabled, This means meter data in the CSV files retrieved will now be in the format: " + MeterDataFormatted.EL_OVERBLIK_CSV_HEADERS;
             return ScreenFactory.resultScreen(content);
         });
     }

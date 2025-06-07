@@ -28,6 +28,7 @@ public class DataAccessTokenManager {
         configSaver = SimpleConfigSaver.getInstance();
         configLoader = SimpleConfigLoader.getInstance();
     }
+
     public DataAccessTokenManager(ConfigurationSaver configSaver, ConfigurationLoader configLoader) {
         this.configSaver = configSaver;
         this.configLoader = configLoader;
@@ -45,7 +46,7 @@ public class DataAccessTokenManager {
             HttpClient httpClient = HttpClient.newHttpClient();
 
             String apiKey = configLoader.getApiKey();
-            if(apiKey.isEmpty()){
+            if (apiKey.isEmpty()) {
                 throw new MissingApiKeyException("Could not retrieve El Overblik API key. Have you updated /config/api-key.conf? See README.md if in doubt about what it needs.");
             }
             HttpRequest httpRequest =
@@ -55,7 +56,7 @@ public class DataAccessTokenManager {
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                switch(response.statusCode()){
+                switch (response.statusCode()) {
                     case 429:
                         System.out.println("El Overblik API denies further request for data due to too users requesting data. Please try again later.");
                         break;
@@ -83,6 +84,7 @@ public class DataAccessTokenManager {
         }
         throw new ElectricityConsolidatorRuntimeException("Could not retrieve data access token.");
     }
+
     private boolean shouldUseCachedDataAccessToken() {
         Optional<String> lastAccessDate = configLoader.getProperty(ConfigurationKeys.LAST_DATA_ACCESS_REFRESH);
         if (lastAccessDate.isEmpty()) return false;

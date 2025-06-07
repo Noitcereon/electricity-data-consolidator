@@ -3,7 +3,7 @@ package me.noitcereon.external.api.eloverblik;
 import java.time.LocalDate;
 
 public class ElOverblikApiEndpoint {
-    private ElOverblikApiEndpoint(){
+    private ElOverblikApiEndpoint() {
         // Do not instantiate.
     }
 
@@ -14,10 +14,11 @@ public class ElOverblikApiEndpoint {
     private static final String METER_DATA_CSV = BASE_URL + "meterdata/timeseries/export/";
     private static final String METER_DATA_RAW = BASE_URL + "/meterdata/gettimeseries/";
 
-    public static String getMeterDataCsvEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit){
+    public static String getMeterDataCsvEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         return METER_DATA_CSV + dateFrom + "/" + dateTo + "/" + aggregationUnit.label;
     }
-    public static String getMeterDataRawEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit){
+
+    public static String getMeterDataRawEndPoint(LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         return METER_DATA_RAW + dateFrom + "/" + dateTo + "/" + aggregationUnit.label;
     }
 

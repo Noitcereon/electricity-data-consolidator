@@ -11,7 +11,7 @@ class FileNameGeneratorTest {
     void givenFromDateAndToDate_WhenGeneratingMeterDataCsvFileName_ThenNameIsAsExpected() {
         String expected = "meterdata2024-01-01-2025-05-02.csv";
         LocalDate dateFrom = LocalDate.of(2024, 1, 1);
-        LocalDate dateTo = LocalDate.of(2025, 5,2);
+        LocalDate dateTo = LocalDate.of(2025, 5, 2);
 
         String actual = FileNameGenerator.meterDataCsvFile(dateFrom, dateTo);
 
@@ -22,7 +22,7 @@ class FileNameGeneratorTest {
     void meterDataCustomFormatCsvFile() {
         String expected = "meterdata-custom-format2024-01-01-2025-05-02.csv";
         LocalDate dateFrom = LocalDate.of(2024, 1, 1);
-        LocalDate dateTo = LocalDate.of(2025, 5,2);
+        LocalDate dateTo = LocalDate.of(2025, 5, 2);
 
         String actual = FileNameGenerator.meterDataCustomFormatCsvFile(dateFrom, dateTo);
 

@@ -27,6 +27,7 @@ public class ApiModelToDataFileConverterTest {
         // Act and Assert (no exceptions)
         unitUnderTest.createCsvFile(tempList, "tempModel.csv");
     }
+
     @Test
     @Disabled("Because this feature has not been implemented yet.")
     public void givenModeldata_WhenConvertingToCsvFile_ThenDataWrittenMatchesDataGiven() throws IOException {
@@ -42,6 +43,7 @@ public class ApiModelToDataFileConverterTest {
         // Assert
         Assertions.fail("Conversion from datamodel to CSV file has not been implemented yet.");
     }
+
     @Test
     public void givenModelData_WhenConvertingToJsonFile_ThenFileIsCreated() throws IOException {
         MethodOutcome expectedOutcome = MethodOutcome.SUCCESS;
@@ -62,8 +64,9 @@ public class ApiModelToDataFileConverterTest {
     class TempModel {
         public String name;
         public int age;
+
         @Override
-        public String toString(){
+        public String toString() {
             return this.name + ";" + this.age;
         }
     }

@@ -26,7 +26,7 @@ class MeterDataFormattedTest {
         String expectedFormat = "Målepunkt id;Fra dato;Til dato;Mængde;Måleenhed;Kvalitet;Type;TimeSlag" + System.lineSeparator()
                 + "571313174001764929;09-05-2024;09-05-2024;0,752;KWH;Målt;Tidsserie;16" + System.lineSeparator();
 
-        String actualFormat = meterData.asCsv( true);
+        String actualFormat = meterData.asCsv(true);
 
         Assertions.assertEquals(expectedFormat, actualFormat);
     }
@@ -86,6 +86,7 @@ class MeterDataFormattedTest {
 
         Assertions.assertEquals(expectedSize, actual.size());
     }
+
     @Test
     void givenMeterDataCsvStringInOriginalFormat_WhenCreatingMeterDataFormattedObject_ThenCsvDataIsConvertedCorrectly() {
         String meterDataCsvAsGivenByApi = """

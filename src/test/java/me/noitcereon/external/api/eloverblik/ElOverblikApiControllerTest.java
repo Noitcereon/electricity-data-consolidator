@@ -23,10 +23,12 @@ class ElOverblikApiControllerTest {
 
     private static ElOverblikApiController controller;
     private static final Logger LOG = LoggerFactory.getLogger(ElOverblikApiControllerTest.class);
+
     @BeforeAll // Runs a single time when this tests in this class are to be executed
     public static void setUp() {
         controller = new ElOverblikApiController(SimpleConfigSaver.getInstance(), SimpleConfigLoader.getInstance());
     }
+
     @Test
     void givenApiTokenIsConfigured_WhenRetrievingDataAccessToken_ThenAccessTokenIsNotNull() {
         String accessToken = controller.retrieveDataAccessToken();
@@ -45,8 +47,9 @@ class ElOverblikApiControllerTest {
 
         assertTrue(expectedMinTokenLength < actualTokenLength);
     }
+
     @Test
-    void givenDataAccessToken_WhenRetrievingMeteringPoints_ThenResponseWithDataIsReturned(){
+    void givenDataAccessToken_WhenRetrievingMeteringPoints_ThenResponseWithDataIsReturned() {
         // Arrange
         boolean includeAll = false;
         String unexpectedMeteringPointId = "";
@@ -55,10 +58,11 @@ class ElOverblikApiControllerTest {
         Optional<List<MeteringPointApiDto>> meteringPointsOptional = controller.getMeteringPoints(includeAll);
         // Assert
         List<MeteringPointApiDto> meteringsPoints = meteringPointsOptional.orElseThrow();
-        if(meteringsPoints.isEmpty()) Assertions.fail("No meteringpoint data for some reason.");
+        if (meteringsPoints.isEmpty()) Assertions.fail("No meteringpoint data for some reason.");
         String meteringPointId = meteringsPoints.get(0).getMeteringPointId();
         Assertions.assertNotEquals(unexpectedMeteringPointId, meteringPointId);
     }
+
     @Test
     void givenDataAccessToken_WhenRetrievingFormattedMeterData_ThenOutcomeIsSuccessful() throws IOException {
         // Arrange
@@ -71,13 +75,14 @@ class ElOverblikApiControllerTest {
         // Assert
         Assertions.assertEquals(MethodOutcome.SUCCESS, actual);
     }
+
     @Test
-    void givenDataAccessTokenAndMeteringPointsAndFromToDate_WhenFetchingHourlyMeterDataAsFile_ThenSuccessIsReturned(){
+    void givenDataAccessTokenAndMeteringPointsAndFromToDate_WhenFetchingHourlyMeterDataAsFile_ThenSuccessIsReturned() {
         LocalDate startFirstOfJan2024 = LocalDate.of(2024, Month.JANUARY, 1);
         LocalDate endSecondOfJan2024 = LocalDate.of(2024, Month.JANUARY, 2);
         Optional<List<MeteringPointApiDto>> meteringPoints = controller.getMeteringPoints(false);
         MethodOutcome result = null;
-        if(meteringPoints.isPresent()){
+        if (meteringPoints.isPresent()) {
             MeteringPointsRequest meteringPointsToGetDataFrom = MeteringPointsRequest.from(meteringPoints.get());
             result = controller.fetchMeterDataCsvFile(meteringPointsToGetDataFrom, startFirstOfJan2024, endSecondOfJan2024, TimeAggregation.HOUR);
         }

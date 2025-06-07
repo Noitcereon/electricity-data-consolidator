@@ -23,22 +23,18 @@ public class Main {
                 option = nextScreen.displayScreenAndAskForInput();
                 appLoops++;
             }
-        }
-        catch (MissingApiKeyException apiKeyException){
+        } catch (MissingApiKeyException apiKeyException) {
             System.err.println(apiKeyException.getMessage());
             Thread.sleep(5000);
-        }
-        catch (NumberFormatException numberFormatEx){
+        } catch (NumberFormatException numberFormatEx) {
             LOG.error("Couldn't parse the given input as a number");
             main(new String[]{""});
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("An error occurred, which the application was not built to handle. Showing information that can help debug the problem: ", e);
             System.out.println("### Press ENTER to close the application ####");
             Screen.getScannerInstance().nextLine();
             System.exit(1);
-        }
-        finally {
+        } finally {
             Screen.getScannerInstance().close();
         }
     }

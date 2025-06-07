@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SimpleConfigLoaderTest {
 
     private SimpleConfigLoader loader = SimpleConfigLoader.getInstance();
+
     @Test
     void givenKey_WhenGettingProperty_ThenExpectANonNullStringValue() {
         String expected = "manually-entered-value";

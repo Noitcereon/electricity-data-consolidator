@@ -7,12 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.file.*;
 
-public class SimpleConfigSaver implements ConfigurationSaver{
+public class SimpleConfigSaver implements ConfigurationSaver {
     private static SimpleConfigSaver instance;
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleConfigSaver.class);
 
-    private SimpleConfigSaver(){
+    private SimpleConfigSaver() {
         // Prevent accidental instantiation.
     }
 
@@ -36,21 +36,18 @@ public class SimpleConfigSaver implements ConfigurationSaver{
     private void ensureFileExists(Path configFile) {
         try {
             Files.createFile(configFile);
-        }
-        catch (FileAlreadyExistsException e){
+        } catch (FileAlreadyExistsException e) {
             // Ignore.
-        }
-        catch (NoSuchFileException e){
+        } catch (NoSuchFileException e) {
             LOG.error("Error when trying to create file at {}", configFile.toAbsolutePath());
             throw new ElectricityConsolidatorRuntimeException(e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new ElectricityConsolidatorRuntimeException(e);
         }
     }
 
-    public static SimpleConfigSaver getInstance(){
-        if(instance == null){
+    public static SimpleConfigSaver getInstance() {
+        if (instance == null) {
             instance = new SimpleConfigSaver();
         }
         return instance;

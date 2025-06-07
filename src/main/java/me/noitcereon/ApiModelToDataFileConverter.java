@@ -35,6 +35,7 @@ public class ApiModelToDataFileConverter {
             writer.flush();
         }
     }
+
     public <T> MethodOutcome createJsonFile(List<T> dataModels, String fileName) throws IOException {
         Path filePath = Paths.get(OUTPUT_DIRECTORY_PATH.toString(), fileName);
         if (dataModels == null || dataModels.isEmpty()) {

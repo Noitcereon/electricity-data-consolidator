@@ -49,7 +49,8 @@
             <fileMode>661</fileMode>
         </file>
         <file>
-            <source>${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</source>
+            <source>${project.basedir}/target/${project.artifactId}-${project.version}-jar-with-dependencies.jar
+            </source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>

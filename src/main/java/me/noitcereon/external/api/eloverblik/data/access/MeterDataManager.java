@@ -52,6 +52,7 @@ public class MeterDataManager {
 
     /**
      * This fetches the raw API response for usage in app if needed.
+     *
      * @param meteringPointsRequestBody
      * @param dateFrom
      * @param dateTo
@@ -59,7 +60,7 @@ public class MeterDataManager {
      * @return Raw api response encapsualted in an Optional.
      */
     public Optional<MyEnergyDataMarketDocumentResponseListApiResponse> fetchEnergyDataMarketDocument(MeteringPointsRequest meteringPointsRequestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
-        try{
+        try {
             String endpoint = ElOverblikApiEndpoint.getMeterDataRawEndPoint(dateFrom, dateTo, aggregationUnit);
             HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
             ObjectMapper objectMapper = new ObjectMapper();
@@ -70,21 +71,18 @@ public class MeterDataManager {
             LOG.info("Sending request to ElOverblikApi. Request: {}", request);
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if(response.statusCode() == 200 || response.statusCode() < 300){
+            if (response.statusCode() == 200 || response.statusCode() < 300) {
                 LOG.info("Successful request to {}", request.uri());
                 LOG.info(response.body());
                 MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(response.body(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
 
                 return Optional.of(responseBody);
-            }
-            else{
+            } else {
                 throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + response.statusCode());
             }
-        }
-        catch (InterruptedException intEx){
+        } catch (InterruptedException intEx) {
             Thread.currentThread().interrupt();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             LOG.error("Exception occurred when sending request to ElOverblikApi", e);
         }
         return Optional.empty(); // Something went wrong.
@@ -105,12 +103,12 @@ public class MeterDataManager {
 
             // Prepare for file for response
             Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
-            if(!fileDirectory.toFile().exists()){
+            if (!fileDirectory.toFile().exists()) {
                 Files.createDirectory(fileDirectory);
             }
 
             Path filePath = Path.of(fileDirectory.toString(), FileNameGenerator.meterDataCsvFile(dateFrom, dateTo));
-            if(filePath.toFile().exists()){
+            if (filePath.toFile().exists()) {
                 // We already have the data, so no need to fetch it a second time.
                 return MethodOutcome.SUCCESS;
             }
@@ -123,17 +121,16 @@ public class MeterDataManager {
             }
             LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
             LOG.warn("Response to request: {}", response);
-        }
-        catch (FileAlreadyExistsException ex){
+        } catch (FileAlreadyExistsException ex) {
             LOG.info("You've already fetched data for this period (see file: '%s'".formatted(ex.getFile()));
-        }
-        catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
             Thread.currentThread().interrupt();
         }
         return MethodOutcome.FAILURE;
     }
+
     public Optional<String> fetchMeterDataInPeriodAsCsvString(MeteringPointsRequest httpRequestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         try {
             String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
@@ -156,8 +153,7 @@ public class MeterDataManager {
             }
             LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
             LOG.warn("Response to request: {}", response);
-        }
-        catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             LOG.error(e.getMessage());
             e.printStackTrace();
             Thread.currentThread().interrupt();

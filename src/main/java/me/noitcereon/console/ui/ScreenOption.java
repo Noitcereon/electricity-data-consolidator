@@ -8,11 +8,10 @@ public class ScreenOption {
     private final ScreenAction action;
 
     /**
-     *
-     * @param description Describes what will happen when this option is selected.
+     * @param description      Describes what will happen when this option is selected.
      * @param callbackFunction The action to perform when this option is selected.
      */
-    public ScreenOption(String description, ScreenAction callbackFunction){
+    public ScreenOption(String description, ScreenAction callbackFunction) {
         this.description = description;
         this.action = callbackFunction;
     }
@@ -20,14 +19,16 @@ public class ScreenOption {
     /**
      * Executes the ScreenAction inside the ScreenOption object.
      */
-    public Screen execute(){
+    public Screen execute() {
         return action.actionToPerform();
     }
-    public String getDescription(){
+
+    public String getDescription() {
         return description;
     }
+
     @Override
-    public String toString(){
+    public String toString() {
         return description;
     }
 }

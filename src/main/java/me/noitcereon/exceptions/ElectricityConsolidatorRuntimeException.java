@@ -6,9 +6,10 @@ package me.noitcereon.exceptions;
  */
 public class ElectricityConsolidatorRuntimeException extends RuntimeException {
 
-    public ElectricityConsolidatorRuntimeException(){
+    public ElectricityConsolidatorRuntimeException() {
         super();
     }
+
     public ElectricityConsolidatorRuntimeException(Throwable cause) {
         super(cause);
     }

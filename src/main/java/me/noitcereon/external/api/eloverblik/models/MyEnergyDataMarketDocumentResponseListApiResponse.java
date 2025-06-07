@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * A wrapper around a list of {@link MyEnergyDataMarketDocumentResponse}.
+ *
  * @param result
  */
 @EloverblikApiModel

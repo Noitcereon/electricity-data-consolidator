@@ -83,34 +83,35 @@ public class ElOverblikApiController {
 
     /**
      * Retrieves a csv file containing MeterData and then tries to format it to {@link MeterDataFormatted} and creates it as a csv file in dataFromApi.
+     *
      * @param meteringPointsRequest Http request body containing which meteringPoints to fetch MeterData from.
-     * @param dateFrom Start date to fetch data from.
-     * @param dateTo End date to fetch data from.
-     * @param timeAggregation Most likely {@link TimeAggregation#HOUR} (at the time of writing nothing else has been used).
+     * @param dateFrom              Start date to fetch data from.
+     * @param dateTo                End date to fetch data from.
+     * @param timeAggregation       Most likely {@link TimeAggregation#HOUR} (at the time of writing nothing else has been used).
      * @return {@link MethodOutcome#SUCCESS} if file is created with data or already exists with data. Otherwise, {@link MethodOutcome#FAILURE}
      * @throws IOException On failure to create necessary files.
      */
     public MethodOutcome fetchMeterDataCsvCustomFormat(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation timeAggregation) throws IOException {
         // Prepare a file for response data.
         Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
-        if(!fileDirectory.toFile().exists()){
+        if (!fileDirectory.toFile().exists()) {
             Files.createDirectory(fileDirectory);
         }
         Path filePath = Path.of(fileDirectory.toString(), FileNameGenerator.meterDataCustomFormatCsvFile(dateFrom, dateTo));
-        if(filePath.toFile().exists() && filePath.toFile().length() != 0){
+        if (filePath.toFile().exists() && filePath.toFile().length() != 0) {
             // We already have the data, so no need to fetch it a second time.
             return MethodOutcome.SUCCESS;
         }
 
         Optional<String> originalCsvFromApi = meterDataManager.fetchMeterDataInPeriodAsCsvString(meteringPointsRequest, dateFrom, dateTo, timeAggregation);
-        if(originalCsvFromApi.isEmpty()) return MethodOutcome.FAILURE;
+        if (originalCsvFromApi.isEmpty()) return MethodOutcome.FAILURE;
         List<MeterDataFormatted> formattedMeterData = MeterDataFormatted.parseFrom(originalCsvFromApi.get());
         Path csvFilePath = Files.createFile(filePath);
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toFile()))){
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toFile()))) {
             boolean shouldAddHeader = true;
             for (MeterDataFormatted meterDataEntry : formattedMeterData) {
                 writer.write(meterDataEntry.asCsv(shouldAddHeader));
-                if(shouldAddHeader) shouldAddHeader = false;
+                if (shouldAddHeader) shouldAddHeader = false;
             }
         }
         return MethodOutcome.SUCCESS;
@@ -118,7 +119,7 @@ public class ElOverblikApiController {
 
     public MethodOutcome fetchMeterDataCsvFile(MeteringPointsRequest meteringPointsRequest, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         MethodOutcome result = meterDataManager.fetchMeterDataInPeriodAsCsvFile(meteringPointsRequest, dateFrom, dateTo, aggregationUnit);
-        if(result == MethodOutcome.SUCCESS){
+        if (result == MethodOutcome.SUCCESS) {
             LOG.info("""
                     MeterData from the following MeteringPoints: {}
                     in the following period:

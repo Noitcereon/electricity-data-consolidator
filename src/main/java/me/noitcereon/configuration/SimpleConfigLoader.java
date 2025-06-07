@@ -36,6 +36,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         if (propertyCache.containsKey(key)) return Optional.of(propertyCache.get(key));
         return Optional.empty();
     }
+
     @Override
     public Optional<String> getProperty(String key, String fallbackValue) {
         updateConfigurationFiles(key);
@@ -45,7 +46,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
     }
 
     private void updateConfigurationFiles(String key) {
-        if(files.stream().noneMatch(knownConfFiles -> knownConfFiles.equals(key + ".conf"))){
+        if (files.stream().noneMatch(knownConfFiles -> knownConfFiles.equals(key + ".conf"))) {
             files.add(key + ".conf");
         }
     }
@@ -108,17 +109,19 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         }
         return configFilePath;
     }
-    public String getApiKey(){
+
+    public String getApiKey() {
         String key = ConfigurationKeys.API_KEY;
-        if(getProperty(key).isEmpty()){
+        if (getProperty(key).isEmpty()) {
             LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
             return "";
         }
         return getProperty(key).orElseThrow();
     }
-    public String getDataAccessToken(){
+
+    public String getDataAccessToken() {
         String key = ConfigurationKeys.DATA_ACCESS_TOKEN;
-        if(getProperty(key).isEmpty()){
+        if (getProperty(key).isEmpty()) {
             LOG.error("Data access token has not been set in the data-access-token.conf (./config/data-access-token.conf).");
             return "";
         }

@@ -1,6 +1,6 @@
 package me.noitcereon.exceptions;
 
-public class MissingApiKeyException extends RuntimeException{
+public class MissingApiKeyException extends RuntimeException {
     public MissingApiKeyException() {
         super("Missing Api key for the application to work. Have you updated the appropriate configuration in the /config folder?");
     }

@@ -33,20 +33,23 @@ public class Screen {
         this.content = "";
         menuOptions.put(0, ScreenOptionFactory.exitApplication());
     }
-    public Screen(String headLine, String content, Map<Integer, ScreenOption> menuOptions){
+
+    public Screen(String headLine, String content, Map<Integer, ScreenOption> menuOptions) {
         this.headLine = headLine;
         this.content = content;
         this.menuOptions = menuOptions;
         menuOptions.put(0, ScreenOptionFactory.exitApplication());
     }
-    public static Scanner getScannerInstance(){
+
+    public static Scanner getScannerInstance() {
         return SCANNER;
     }
 
     public String getHeadLine() {
         return headLine;
     }
-    public String getContent(){
+
+    public String getContent() {
         return content;
     }
 

@@ -1,6 +1,8 @@
 package me.noitcereon.external.api.eloverblik.models;
 
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,13 +44,14 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
     private static final DateTimeFormatter DAY_MONTH_YEAR_HH_MM_SS = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     private static final String NEW_LINE_REGEX = "\\n|\\r\\n|\\r";
     private static final String MAALEPUNKT_ID = "Målepunkt id"; // Refactored into instance variable, because it's used in multiple places.
+    private static final Logger log = LoggerFactory.getLogger(MeterDataFormatted.class);
 
+    /**
+     * Maps a TimesSeries object into a List of formatted meter data.
+     * @param timeSeries
+     * @return
+     */
     public static List<MeterDataFormatted> from(TimeSeries timeSeries) {
-        // For every Period
-        // If Period has 24 entries/is of hourly data
-        // extract information from the period as FormattedMeterData
-        // Add it to formattedMeterData list
-        // Return formattedMeterData.
         List<MeterDataFormatted> output = new ArrayList<>();
         for (Period period : timeSeries.periods()) {
             for (Point point : period.points()) {
@@ -86,12 +89,6 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
      * @return The given argument as a list of {@link MeterDataFormatted}.
      */
     public static List<MeterDataFormatted> parseFrom(String apiCsvFileContents) {
-
-        String normalizedCsvInput = apiCsvFileContents.stripIndent().strip();
-        if (!normalizedCsvInput.contains(MAALEPUNKT_ID)) {
-            throw new IllegalArgumentException("Can't parse normalized 'apiCsvFileContents': '" + normalizedCsvInput + "'");
-        }
-
         return Arrays.stream(apiCsvFileContents.split(NEW_LINE_REGEX))
                 .parallel() // To utilize multiple threads
                 .map(MeterDataFormatted::parseCsvLine)
@@ -106,7 +103,9 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
      */
     private static Optional<MeterDataFormatted> parseCsvLine(String meterDataAsCsvLine) {
         try {
-            if (meterDataAsCsvLine.contains(MAALEPUNKT_ID)) {
+            /* Checking both, because the API changed the format from using spaces in header names to using underscore.
+             * Now this check should work, either way. */
+            if (meterDataAsCsvLine.contains("Fra_dato") || meterDataAsCsvLine.contains(MAALEPUNKT_ID)) {
                 return Optional.empty(); // This is csv header and thus cannot be parsed.
             }
             String[] meterDataArray = meterDataAsCsvLine.split(";");
@@ -120,6 +119,7 @@ public record MeterDataFormatted(String meteringPointId, LocalDateTime fromDateT
             String dataQuality = meterDataArray[5];
             return Optional.of(new MeterDataFormatted(meteringPointId, fromTime, toTime, hourOfDay, amount, unitOfMeasurement, dataQuality));
         } catch (Exception e) {
+            log.warn("Failed to parse a line of meterdata due to: {}", e.getMessage());
             return Optional.empty();
         }
     }

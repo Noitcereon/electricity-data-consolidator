@@ -1,6 +1,7 @@
 package me.noitcereon.configuration;
 
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
+import me.noitcereon.exceptions.MissingApiKeyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,8 +148,8 @@ public class SimpleConfigLoader implements ConfigurationLoader {
                 value.append(character);
             }
         }
-        if (key.toString().equals("")) {
-            throw new NullPointerException("Key must not be null or empty.");
+        if (key.toString().isEmpty()) {
+            throw new MissingApiKeyException();
         }
         if (value.isEmpty()) {
             LOG.error("Warning: The value for the key {} is empty.", key);

@@ -17,6 +17,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
+import static me.noitcereon.configuration.ConfigurationKeys.CUSTOM_METER_DATA_FORMAT_ENABLED_KEY;
+
 /**
  * Contains the available options for the application.
  */
@@ -25,7 +27,6 @@ public class ScreenOptionFactory {
     private final ConfigurationLoader configLoader;
     private final ConfigurationSaver configSaver;
     private final ElOverblikApiController elOverblikApi;
-    private static final String CUSTOM_METER_DATA_FORMAT_ENABLED_KEY = "custom-meter-data-format-enabled";
     public static final String FALSE = "false";
 
     public ScreenOptionFactory() {

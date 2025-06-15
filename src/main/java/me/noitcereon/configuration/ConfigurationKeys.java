@@ -16,4 +16,6 @@ public class ConfigurationKeys {
      * it is easy to only fetch data in the period that has been missed.
      */
     public static final String LATEST_METER_DATA_FETCH_DATE = "latest-meter-data-fetch-date";
+    public static final String CUSTOM_METER_DATA_FORMAT_ENABLED_KEY = "custom-meter-data-format-enabled";
+
 }

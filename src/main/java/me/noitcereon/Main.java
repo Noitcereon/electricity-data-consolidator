@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         try {
             Screen mainMenu = ScreenFactory.createMainMenu();
             ScreenOption option = mainMenu.displayScreenAndAskForInput();
@@ -25,16 +25,14 @@ public class Main {
             }
         } catch (MissingApiKeyException apiKeyException) {
             System.err.println(apiKeyException.getMessage());
-            Thread.sleep(5000);
         } catch (NumberFormatException numberFormatEx) {
             LOG.error("Couldn't parse the given input as a number");
             main(new String[]{""});
         } catch (Exception e) {
             LOG.error("An error occurred, which the application was not built to handle. Showing information that can help debug the problem: ", e);
+        } finally {
             System.out.println("### Press ENTER to close the application ####");
             Screen.getScannerInstance().nextLine();
-            System.exit(1);
-        } finally {
             Screen.getScannerInstance().close();
         }
     }

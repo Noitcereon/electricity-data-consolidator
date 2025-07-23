@@ -9,13 +9,14 @@ import me.noitcereon.external.api.eloverblik.ElOverblikApiAuthenticationHelper;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
 import me.noitcereon.external.api.eloverblik.models.*;
+import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
+import me.noitcereon.external.api.orchestration.ApiCallResult;
 import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.FileAlreadyExistsException;
@@ -32,11 +33,9 @@ import java.util.Optional;
 public class MeterDataManager {
     private final ConfigurationLoader configLoader;
     private static final Logger LOG = LoggerFactory.getLogger(MeterDataManager.class);
-    private HttpClient httpClient;
 
     public MeterDataManager() {
         configLoader = SimpleConfigLoader.getInstance();
-        httpClient = HttpClient.newHttpClient();
     }
 
     public MeterDataManager(ConfigurationLoader configLoader) {
@@ -68,17 +67,16 @@ public class MeterDataManager {
             requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
             requestBuilder.header("Content-Type", "application/json");
             HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
-            LOG.info("Sending request to ElOverblikApi. Request: {}", request);
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200 || response.statusCode() < 300) {
+            ApiCallResult<String> apiCallResult = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
+
+            if (apiCallResult.isSuccess() && apiCallResult.responseBody().isPresent()) {
                 LOG.info("Successful request to {}", request.uri());
-                LOG.info(response.body());
-                MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(response.body(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
+                MyEnergyDataMarketDocumentResponseListApiResponse responseBody = objectMapper.readValue(apiCallResult.responseBody().get(), MyEnergyDataMarketDocumentResponseListApiResponse.class);
 
                 return Optional.of(responseBody);
             } else {
-                throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + response.statusCode());
+                throw new ElectricityConsolidatorRuntimeException("Failed to fetch meterdata... API response code: " + apiCallResult.httpStatusCode());
             }
         } catch (InterruptedException intEx) {
             Thread.currentThread().interrupt();
@@ -114,13 +112,10 @@ public class MeterDataManager {
             }
             Path csvFilePath = Files.createFile(filePath);
 
-            HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
-            if (response.statusCode() == 200) {
-                LOG.info("Success!");
+            ApiCallResult<Path> response = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
+            if (response.isSuccess()) {
                 return MethodOutcome.SUCCESS;
             }
-            LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
-            LOG.warn("Response to request: {}", response);
         } catch (FileAlreadyExistsException ex) {
             LOG.info("You've already fetched data for this period (see file: '%s'".formatted(ex.getFile()));
         } catch (IOException | InterruptedException e) {
@@ -144,15 +139,11 @@ public class MeterDataManager {
             requestBuilder.header("Content-Type", "application/json");
             HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
 
-            LOG.info("Sending ElOverblikApi HTTP request to {} ", request.uri());
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            LOG.info("Response from ElOverblikApi HTTP request to {} resulted in status code {}", request.uri(), response.statusCode());
-            if (response.statusCode() == 200) {
-                LOG.info("Success!");
-                return Optional.of(response.body());
+            ApiCallResult<String> apiCallResult = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
+
+            if (apiCallResult.isSuccess()) {
+                return apiCallResult.responseBody();
             }
-            LOG.warn("The request {} failed to get a successful response. Request body: {}", request, requestBodyJson);
-            LOG.warn("Response to request: {}", response);
         } catch (IOException | InterruptedException e) {
             LOG.error(e.getMessage());
             e.printStackTrace();

@@ -150,8 +150,8 @@ public class SimpleConfigLoader implements ConfigurationLoader {
                 value.append(character);
             }
         }
-        if (key.toString().equals("")) {
-            throw new NullPointerException("Key must not be null or empty.");
+        if (key.toString().isEmpty()) {
+            throw new IllegalStateException("Key must not be null or empty.");
         }
         if (value.isEmpty()) {
             LOG.error("Warning: The value for the key {} is empty.", key);

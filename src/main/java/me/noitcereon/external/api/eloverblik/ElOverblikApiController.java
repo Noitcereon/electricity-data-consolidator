@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -107,7 +108,7 @@ public class ElOverblikApiController {
         if (originalCsvFromApi.isEmpty()) return MethodOutcome.FAILURE;
         List<MeterDataFormatted> formattedMeterData = MeterDataFormatted.parseFrom(originalCsvFromApi.get());
         Path csvFilePath = Files.createFile(filePath);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toFile()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFilePath.toFile(), StandardCharsets.UTF_8))) {
             boolean shouldAddHeader = true;
             for (MeterDataFormatted meterDataEntry : formattedMeterData) {
                 writer.write(meterDataEntry.asCsv(shouldAddHeader));

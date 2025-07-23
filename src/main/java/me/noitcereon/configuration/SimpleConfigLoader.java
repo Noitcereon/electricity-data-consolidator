@@ -45,6 +45,24 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         return Optional.of(fallbackValue);
     }
 
+    public String getApiKey() {
+        String key = ConfigurationKeys.API_KEY;
+        if (getProperty(key).isEmpty()) {
+            LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
+            return "";
+        }
+        return getProperty(key).orElseThrow();
+    }
+
+    public String getDataAccessToken() {
+        String key = ConfigurationKeys.DATA_ACCESS_TOKEN;
+        if (getProperty(key).isEmpty()) {
+            LOG.error("Data access token has not been set in the data-access-token.conf (./config/data-access-token.conf).");
+            return "";
+        }
+        return getProperty(key).orElseThrow();
+    }
+
     private void updateConfigurationFiles(String key) {
         if (files.stream().noneMatch(knownConfFiles -> knownConfFiles.equals(key + ".conf"))) {
             files.add(key + ".conf");
@@ -110,54 +128,40 @@ public class SimpleConfigLoader implements ConfigurationLoader {
         return configFilePath;
     }
 
-    public String getApiKey() {
-        String key = ConfigurationKeys.API_KEY;
-        if (getProperty(key).isEmpty()) {
-            LOG.error("Api key has not been set in the api-key.conf (./config/api-key.conf). Format in the file is 'api-key=your-api-key'");
-            return "";
-        }
-        return getProperty(key).orElseThrow();
-    }
-
-    public String getDataAccessToken() {
-        String key = ConfigurationKeys.DATA_ACCESS_TOKEN;
-        if (getProperty(key).isEmpty()) {
-            LOG.error("Data access token has not been set in the data-access-token.conf (./config/data-access-token.conf).");
-            return "";
-        }
-        return getProperty(key).orElseThrow();
-    }
-
     private Map.Entry<String, String> convertLineToKeyValuePair(String line) {
-        // TODO: Refactor this method to be more readable
+
+        Map.Entry<String, String> keyValuePair = readLineAsKeyValuePair(line);
+        if (keyValuePair.getKey().isEmpty()) {
+            throw new IllegalStateException("Key must not be null or empty.");
+        }
+        if (keyValuePair.getValue().isEmpty()) {
+            LOG.error("Warning: The value for the key {} is empty.", keyValuePair.getKey());
+        }
+
+        return keyValuePair;
+    }
+
+    private static Map.Entry<String, String> readLineAsKeyValuePair(String line) {
         char delimiterChar = '=';
         char encapsulationChar = '"';
+        boolean isDelimiterReached = false;
         StringBuilder key = new StringBuilder();
         StringBuilder value = new StringBuilder();
-        boolean isDelimiterReached = false;
+
         for (char character : line.toCharArray()) {
             if (character == delimiterChar) {
                 isDelimiterReached = true;
-                continue;
             }
-            if (character == encapsulationChar) {
+            if (character == encapsulationChar || character == delimiterChar) {
                 continue; // The second time this is reached, it should be finished iterating through the line.charArray.
             }
             if (!isDelimiterReached) {
                 key.append(character);
-            }
-            if (isDelimiterReached) {
+            } else {
                 value.append(character);
             }
         }
-        if (key.toString().isEmpty()) {
-            throw new IllegalStateException("Key must not be null or empty.");
-        }
-        if (value.isEmpty()) {
-            LOG.error("Warning: The value for the key {} is empty.", key);
-        }
         Map.Entry<String, String> kvp = Map.entry(key.toString(), value.toString());
-
         Objects.requireNonNull(kvp);
         return kvp;
     }

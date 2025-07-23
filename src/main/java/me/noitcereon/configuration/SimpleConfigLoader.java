@@ -18,7 +18,7 @@ public class SimpleConfigLoader implements ConfigurationLoader {
     /**
      * Specifies which files are known to the SimpleConfigLoader and will be loaded.
      */
-    private Set<String> files;
+    private final Set<String> files;
     private Map<String, String> propertyCache;
     private LocalTime lastRefreshTime;
 

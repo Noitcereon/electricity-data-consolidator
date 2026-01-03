@@ -6,8 +6,11 @@ import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
 import me.noitcereon.exceptions.MissingApiKeyException;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.models.StringApiResponse;
-import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
 import me.noitcereon.external.api.orchestration.ApiCallResult;
+import me.noitcereon.external.api.eloverblik.ElOverblikApiKeyAuthProvider;
+import me.noitcereon.external.api.orchestration.DefaultHttpOrchestrator;
+import me.noitcereon.external.api.orchestration.HttpOrchestrator;
+import me.noitcereon.external.api.orchestration.RequestBuilderFactory;
 import me.noitcereon.utilities.DateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,17 +27,30 @@ public class DataAccessTokenManager {
     private static final Logger LOG = LoggerFactory.getLogger(DataAccessTokenManager.class);
     private final ConfigurationLoader configLoader;
     private final ConfigurationSaver configSaver;
+    private final HttpOrchestrator httpOrchestrator;
+    private final RequestBuilderFactory requestFactory;
 
     public DataAccessTokenManager() {
         configSaver = SimpleConfigSaver.getInstance();
         configLoader = SimpleConfigLoader.getInstance();
+        this.httpOrchestrator = DefaultHttpOrchestrator.getInstance();
+        this.requestFactory = new RequestBuilderFactory(new ElOverblikApiKeyAuthProvider());
     }
 
     public DataAccessTokenManager(ConfigurationSaver configSaver, ConfigurationLoader configLoader) {
         this.configSaver = configSaver;
         this.configLoader = configLoader;
+        this.httpOrchestrator = DefaultHttpOrchestrator.getInstance();
+        this.requestFactory = new RequestBuilderFactory(new ElOverblikApiKeyAuthProvider());
     }
 
+    public DataAccessTokenManager(ConfigurationSaver configSaver, ConfigurationLoader configLoader,
+                                  HttpOrchestrator orchestrator, RequestBuilderFactory requestFactory) {
+        this.configSaver = configSaver;
+        this.configLoader = configLoader;
+        this.httpOrchestrator = orchestrator;
+        this.requestFactory = requestFactory;
+    }
 
     public String retrieveDataAccessToken() {
         String dataAccessToken;
@@ -49,12 +65,9 @@ public class DataAccessTokenManager {
             if (apiKey.isEmpty()) {
                 throw new MissingApiKeyException("Could not retrieve El Overblik API key. Have you updated /config/api-key.conf? See README.md if in doubt about what it needs.");
             }
-            HttpRequest httpRequest =
-                    HttpRequest.newBuilder(getDataAccessTokenEndPoint)
-                            .header("Authorization", "Bearer " + configLoader.getApiKey())
-                            .build();
+            HttpRequest httpRequest = requestFactory.jsonGet(getDataAccessTokenEndPoint);
 
-            ApiCallResult<String> response = ApiCallOrchestrator.executeApiCall(httpRequest, HttpResponse.BodyHandlers.ofString());
+            ApiCallResult<String> response = httpOrchestrator.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (!response.isSuccess()) {
                 switch (response.httpStatusCode()) {
                     case 429:

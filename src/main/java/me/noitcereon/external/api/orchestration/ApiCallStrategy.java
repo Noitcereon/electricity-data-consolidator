@@ -7,4 +7,8 @@ public interface ApiCallStrategy {
     void beforeApiCall(HttpRequest request);
 
     <T> void afterApiCall(HttpRequest request, HttpResponse<T> response);
+
+    default void onError(HttpRequest request, Exception exception) {
+        // default no-op
+    }
 }

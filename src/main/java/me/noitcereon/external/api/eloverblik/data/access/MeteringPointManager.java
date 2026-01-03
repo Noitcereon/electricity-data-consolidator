@@ -2,12 +2,14 @@ package me.noitcereon.external.api.eloverblik.data.access;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.noitcereon.external.api.eloverblik.ElOverblikApiAuthenticationHelper;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDto;
 import me.noitcereon.external.api.eloverblik.models.MeteringPointApiDtoListApiResponse;
-import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
 import me.noitcereon.external.api.orchestration.ApiCallResult;
+import me.noitcereon.external.api.orchestration.DefaultHttpOrchestrator;
+import me.noitcereon.external.api.eloverblik.ElOverblikTokenAuthProvider;
+import me.noitcereon.external.api.orchestration.HttpOrchestrator;
+import me.noitcereon.external.api.orchestration.RequestBuilderFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,10 +19,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class MeteringPointManager {
+    private final HttpOrchestrator httpOrchestrator;
+    private final RequestBuilderFactory requestFactory;
 
     public MeteringPointManager() {
-        // Explicit MeteringPointManager.
-        // Should have sensible defaults for any required dependencies to make it easy to use.
+        this.httpOrchestrator = DefaultHttpOrchestrator.getInstance();
+        this.requestFactory = new RequestBuilderFactory(new ElOverblikTokenAuthProvider());
+    }
+
+    public MeteringPointManager(HttpOrchestrator orchestrator, RequestBuilderFactory requestFactory) {
+        this.httpOrchestrator = orchestrator;
+        this.requestFactory = requestFactory;
     }
 
     /**
@@ -31,12 +40,10 @@ public class MeteringPointManager {
      * @return Returns a list of metering points.
      */
     public Optional<List<MeteringPointApiDto>> getMeteringPoints(boolean includeAll) throws IOException, InterruptedException {
-               HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(ElOverblikApiEndpoint.METERING_POINTS + "?includeAll=" + includeAll))
-                .GET();
-        HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+        URI uri = URI.create(ElOverblikApiEndpoint.METERING_POINTS + "?includeAll=" + includeAll);
+        HttpRequest request = requestFactory.jsonGet(uri);
 
-        ApiCallResult<String> response = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
+        ApiCallResult<String> response = httpOrchestrator.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (!response.isSuccess()) {
             return Optional.empty();

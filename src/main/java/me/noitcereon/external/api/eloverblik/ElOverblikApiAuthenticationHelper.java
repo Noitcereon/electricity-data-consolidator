@@ -4,6 +4,10 @@ import me.noitcereon.external.api.eloverblik.data.access.DataAccessTokenManager;
 
 import java.net.http.HttpRequest;
 
+/**
+ * @deprecated Use {@link ElOverblikTokenAuthProvider} instead.
+ */
+@Deprecated(forRemoval = true)
 public class ElOverblikApiAuthenticationHelper {
     private ElOverblikApiAuthenticationHelper() {
         // Don't instantiate static helper class.

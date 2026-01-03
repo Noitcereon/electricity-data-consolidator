@@ -5,12 +5,14 @@ import me.noitcereon.MethodOutcome;
 import me.noitcereon.configuration.ConfigurationLoader;
 import me.noitcereon.configuration.SimpleConfigLoader;
 import me.noitcereon.exceptions.ElectricityConsolidatorRuntimeException;
-import me.noitcereon.external.api.eloverblik.ElOverblikApiAuthenticationHelper;
 import me.noitcereon.external.api.eloverblik.ElOverblikApiEndpoint;
 import me.noitcereon.external.api.eloverblik.TimeAggregation;
 import me.noitcereon.external.api.eloverblik.models.*;
-import me.noitcereon.external.api.orchestration.ApiCallOrchestrator;
 import me.noitcereon.external.api.orchestration.ApiCallResult;
+import me.noitcereon.external.api.orchestration.DefaultHttpOrchestrator;
+import me.noitcereon.external.api.eloverblik.ElOverblikTokenAuthProvider;
+import me.noitcereon.external.api.orchestration.HttpOrchestrator;
+import me.noitcereon.external.api.orchestration.RequestBuilderFactory;
 import me.noitcereon.utilities.FileNameGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +35,25 @@ import java.util.Optional;
 public class MeterDataManager {
     private final ConfigurationLoader configLoader;
     private static final Logger LOG = LoggerFactory.getLogger(MeterDataManager.class);
+    private final HttpOrchestrator httpOrchestrator;
+    private final RequestBuilderFactory requestFactory;
 
     public MeterDataManager() {
         configLoader = SimpleConfigLoader.getInstance();
+        this.httpOrchestrator = DefaultHttpOrchestrator.getInstance();
+        this.requestFactory = new RequestBuilderFactory(new ElOverblikTokenAuthProvider());
     }
 
     public MeterDataManager(ConfigurationLoader configLoader) {
         this.configLoader = configLoader;
+        this.httpOrchestrator = DefaultHttpOrchestrator.getInstance();
+        this.requestFactory = new RequestBuilderFactory(new ElOverblikTokenAuthProvider());
+    }
+
+    public MeterDataManager(ConfigurationLoader configLoader, HttpOrchestrator orchestrator, RequestBuilderFactory requestFactory) {
+        this.configLoader = configLoader;
+        this.httpOrchestrator = orchestrator;
+        this.requestFactory = requestFactory;
     }
 
     public Optional<List<MeterDataReadingsDto>> getMeterDataInPeriod(LocalDate dateFrom, LocalDate dateTo) {
@@ -61,14 +75,11 @@ public class MeterDataManager {
     public Optional<MyEnergyDataMarketDocumentResponseListApiResponse> fetchEnergyDataMarketDocument(MeteringPointsRequest meteringPointsRequestBody, LocalDate dateFrom, LocalDate dateTo, TimeAggregation aggregationUnit) {
         try {
             String endpoint = ElOverblikApiEndpoint.getMeterDataRawEndPoint(dateFrom, dateTo, aggregationUnit);
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBodyJson = objectMapper.writeValueAsString(meteringPointsRequestBody);
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
-            requestBuilder.header("Content-Type", "application/json");
-            HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+            HttpRequest request = requestFactory.jsonPost(URI.create(endpoint), requestBodyJson);
 
-            ApiCallResult<String> apiCallResult = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
+            ApiCallResult<String> apiCallResult = httpOrchestrator.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (apiCallResult.isSuccess() && apiCallResult.responseBody().isPresent()) {
                 LOG.info("Successful request to {}", request.uri());
@@ -91,13 +102,9 @@ public class MeterDataManager {
             String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
 
             // Build request
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBodyJson = objectMapper.writeValueAsString(requestBody);
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
-            requestBuilder.header("accept", "text/csv");
-            requestBuilder.header("Content-Type", "application/json");
-            HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+            HttpRequest request = requestFactory.csvPost(URI.create(endpoint), requestBodyJson);
 
             // Prepare for file for response
             Path fileDirectory = Path.of(System.getProperty("user.dir"), "dataFromApi");
@@ -112,7 +119,7 @@ public class MeterDataManager {
             }
             Path csvFilePath = Files.createFile(filePath);
 
-            ApiCallResult<Path> response = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
+            ApiCallResult<Path> response = httpOrchestrator.send(request, HttpResponse.BodyHandlers.ofFile(csvFilePath, StandardOpenOption.WRITE));
             if (response.isSuccess()) {
                 return MethodOutcome.SUCCESS;
             }
@@ -131,15 +138,11 @@ public class MeterDataManager {
             String endpoint = ElOverblikApiEndpoint.getMeterDataCsvEndPoint(dateFrom, dateTo, aggregationUnit);
 
             // Build request
-            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(endpoint));
             ObjectMapper objectMapper = new ObjectMapper();
             String requestBodyJson = objectMapper.writeValueAsString(httpRequestBody);
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(requestBodyJson));
-            requestBuilder.header("accept", "text/csv");
-            requestBuilder.header("Content-Type", "application/json");
-            HttpRequest request = ElOverblikApiAuthenticationHelper.addAuthHeader(requestBuilder);
+            HttpRequest request = requestFactory.csvPost(URI.create(endpoint), requestBodyJson);
 
-            ApiCallResult<String> apiCallResult = ApiCallOrchestrator.executeApiCall(request, HttpResponse.BodyHandlers.ofString());
+            ApiCallResult<String> apiCallResult = httpOrchestrator.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (apiCallResult.isSuccess()) {
                 return apiCallResult.responseBody();
